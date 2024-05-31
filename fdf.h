@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/05/31 01:10:17 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/05/31 03:54:08 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 # define WINH 	1080
 # define D_PI	6.2831
 # define PI		3.1416
+# define CENTER_X WINW / 2
+# define CENTER_Y WINH / 2
 
 # define WHITE 0xFFFFFF
 # define BLACK 0x0
@@ -40,6 +42,8 @@
 # define RED 0xFA2828
 # define GRAY_LIGHT 0xC7C7C7
 # define YELLOW 0xF4DD5B
+# define DARK_GOLD 0xDAA520
+# define GOLD 0xFFD700
 
 typedef struct	s_img {
 	void	*img_ptr;

@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/05/31 02:29:38 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/05/31 04:13:54 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,12 +110,83 @@ int	fade_color(t_point *pt)
 	return (trgb_color(t, r, g, b));
 }
 
+void	draw_circle_inward(float center_x, float center_y, int radius, int inner_radius, float smothness, int color1, int color2, float fade, t_img *img)
+{
+	t_circle circle;
+	
+	circle.x = 0;
+	circle.y = 0;
+	circle.center_x = center_x;
+	circle.center_y = center_y;
+	circle.radius = radius;
+	circle.degree = 0;
+	circle.smothness = smothness;
+	circle.increment = PI / circle.smothness;
+	circle.og_color = color1;
+	fade = circle.radius * fade;
+	set_fade_circle(&circle, circle.og_color, color2, (int)fade);
+	while (inner_radius < circle.radius)
+	{
+		circle.degree = 0;
+		circle.x = 0;
+		circle.y = 0;
+		circle.color = fade_color_circle(&circle);
+		while (circle.degree < D_PI)
+		{
+			circle.x = circle.center_x + (circle.radius * cos(circle.degree));
+			circle.y = circle.center_y + (circle.radius * sin(circle.degree));
+			if ((circle.x < 0 || (WINW) <= circle.x) || (circle.y < 0 || (WINH) <= circle.y))
+				circle.x = 0;
+			else 
+				my_mlx_pixel_put(img, circle.x, circle.y, circle.color);		
+			//circle.color = fade_color_circle(&circle);
+			circle.degree += circle.increment;
+		}
+		circle.radius--;
+	}	
+}
+
+void	draw_circle_outward(float center_x, float center_y, int radius, int outer_radius, float smothness, int color1, int color2, float fade, t_img *img)
+{
+	t_circle circle;
+	
+	circle.x = 0;
+	circle.y = 0;
+	circle.center_x = center_x;
+	circle.center_y = center_y;
+	circle.radius = radius;
+	circle.degree = 0;
+	circle.smothness = smothness;
+	circle.increment = PI / circle.smothness;
+	circle.og_color = color1;
+	fade = circle.radius * fade;
+	set_fade_circle(&circle, circle.og_color, color2, (int)fade);
+	while (circle.radius < outer_radius)
+	{
+		circle.degree = 0;
+		circle.x = 0;
+		circle.y = 0;
+		circle.color = fade_color_circle(&circle);
+		while (circle.degree < D_PI)
+		{
+			circle.x = circle.center_x + (circle.radius * cos(circle.degree));
+			circle.y = circle.center_y + (circle.radius * sin(circle.degree));
+			if ((circle.x < 0 || (WINW) <= circle.x) || (circle.y < 0 || (WINH) <= circle.y))
+				circle.x = 0;
+			else 
+				my_mlx_pixel_put(img, circle.x, circle.y, circle.color);		
+			//circle.color = fade_color_circle(&circle);
+			circle.degree += circle.increment;
+		}
+		circle.radius++;
+	}		
+}
+
 int	main(void)
 {
 	t_fdf	fdf;
 	t_img	img;
 	t_point	pt;
-	t_circle	circle;
 	float	x_base;
 	float	y_base;
 	float	ratio;
@@ -157,75 +228,8 @@ int	main(void)
 		}
 		pt.x++;
 	}*/
-	circle.x = 0;
-	circle.y = 0;
-	circle.center_x = WINW / 2;
-	circle.center_y = WINH / 2;
-	circle.radius = 500;
-	circle.degree = 0;
-	circle.smothness = 10000;
-	circle.increment = PI / circle.smothness;
-	circle.og_color = BLACK;
-	int hipo = (int)sqrt((WINW * WINW) + (WINH * WINH));
-	set_fade_circle(&circle, circle.og_color, ORANGE_GULF, circle.radius * 0.85);
-	//circle.radius + circle.center_x < (WINW) || circle.radius + circle.center_y < (WINH)
-	while (circle.radius < hipo)
-	{
-		circle.degree = 0;
-		circle.x = 0;
-		circle.y = 0;
-		circle.color = fade_color_circle(&circle);
-		while (circle.degree < D_PI)
-		{
-			circle.x = circle.center_x + (circle.radius * cos(circle.degree));
-			circle.y = circle.center_y + (circle.radius * sin(circle.degree));
-			if (circle.x < 0)
-				circle.x = 0;
-			else if ((WINW) <= circle.x)
-				circle.x = WINW - 1;
-			if (circle.y < 0)
-				circle.y = 0;
-			else if ((WINH) <= circle.y)
-				circle.y = WINH - 1;
-			my_mlx_pixel_put(&img, circle.x, circle.y, circle.color);		
-			circle.degree += circle.increment;
-		}
-		circle.radius++;
-	}
-	circle.x = 0;
-	circle.y = 0;
-	circle.center_x = WINW / 2;
-	circle.center_y = WINH / 2;
-	circle.radius = 490;
-	circle.degree = 0;
-	circle.smothness = 3000;
-	circle.increment = PI / circle.smothness;
-	circle.og_color = BLACK;
-	set_fade_circle(&circle, circle.og_color, CYAN_GULF, circle.radius * 0.9);
-	while (0 < circle.radius)
-	{
-		circle.degree = 0;
-		circle.x = 0;
-		circle.y = 0;
-		circle.color = fade_color_circle(&circle);
-		while (circle.degree < D_PI)
-		{
-			circle.x = circle.center_x + (circle.radius * cos(circle.degree));
-			circle.y = circle.center_y + (circle.radius * sin(circle.degree));
-			if (circle.x < 0)
-				circle.x = 0;
-			else if ((WINW) <= circle.x)
-				circle.x = WINW - 1;
-			if (circle.y < 0)
-				circle.y = 0;
-			else if ((WINH) <= circle.y)
-				circle.y = WINH - 1;
-			//circle.color = fade_color_circle(&circle);
-			my_mlx_pixel_put(&img, circle.x, circle.y, circle.color);		
-			circle.degree += circle.increment;
-		}
-		circle.radius--;
-	}
+	draw_circle_outward(CENTER_X, CENTER_Y, 500, 1300, 6000, BLACK, ORANGE_GULF, 0.85, &img);
+	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 6000, BLACK, CYAN_GULF, 0.85, &img);
 	mlx_put_image_to_window(fdf.mlx_ptr, fdf.win_ptr, img.img_ptr, 0, 0);
 	mlx_loop(fdf.mlx_ptr);
 }
