@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/05/31 13:51:55 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/05/31 14:01:15 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -367,7 +367,12 @@ void	process_map(t_fdf *fdf, int map)
 }
 void	calculate_bresenham(t_bresenham *bres)
 {
-	
+	if (bres->dx < 0)
+	{
+		bres->ix = bres->fx;
+		bres->iy = bres->fy;
+		bres->fx = 
+	}
 }
 
 void	init_bresenham_line(t_point i_pt, t_point f_pt)
