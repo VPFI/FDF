@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/05/31 08:44:21 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/05/31 09:18:10 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,21 +193,24 @@ void	close_all(t_fdf *fdf)
 void	draw_scene_one(t_fdf *fdf)
 {
 	//add img_ptr as param make it generic
-	mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
+	if (fdf->b_ground.img_ptr)
+		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
 	draw_circle_outward(CENTER_X, CENTER_Y, 500, 1300, 6000, BLACK, ORANGE_GULF, 0.85, &fdf->b_ground);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
 void	draw_scene_two(t_fdf *fdf)
 {
-	mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
+	if (fdf->b_ground.img_ptr)
+		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
 	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 6000, BLACK, CYAN_GULF, 0.85, &fdf->b_ground);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
 void	draw_scene_three(t_fdf *fdf)
 {
-	mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
+	if (fdf->b_ground.img_ptr)
+		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
 	draw_circle_outward(CENTER_X, CENTER_Y, 500, 1300, 6000, BLACK, ORANGE_GULF, 0.85, &fdf->b_ground);	
 	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 6000, BLACK, CYAN_GULF, 0.85, &fdf->b_ground);
@@ -264,6 +267,8 @@ void	draw_sides(t_fdf *fdf, float extent, float y_start, float y_finish, int col
 
 void	draw_welcome_menu(t_fdf *fdf)
 {
+	if (fdf->b_ground.img_ptr)
+		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
 	draw_sides(fdf, 0.5, 0, 1, ORANGE_GULF, BLACK);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
@@ -276,12 +281,17 @@ int	main(void)
 {
 	t_fdf	fdf;
 	t_point	pt;
+	t_img	img;
 	float	x_base;
 	float	y_base;
+	int		img_width;
+	int		img_height;
 
 	init_fdf(&fdf);
-	draw_welcome_menu(&fdf);
-	
+	//draw_welcome_menu(&fdf);
+	img.img_ptr = mlx_xpm_file_to_image(fdf.mlx_ptr, "./test2.xpm", &img_width, &img_height);
+	mlx_put_image_to_window(fdf.mlx_ptr, fdf.win_ptr, img.img_ptr, 0, 0);
+		
 	x_base = 0;
 	y_base = 0;
 	pt.x = x_base;
