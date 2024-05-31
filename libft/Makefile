@@ -6,7 +6,7 @@
 #    By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/09 17:34:45 by vperez-f          #+#    #+#              #
-#    Updated: 2024/01/31 13:27:51 by vperez-f         ###   ########.fr        #
+#    Updated: 2024/05/31 10:52:54 by vperez-f         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ CFILES = ft_memmove.c ft_strjoin.c ft_strrchr.c ft_atoi.c ft_memset.c \
 		 ft_strncmp.c ft_memcpy.c ft_strdup.c ft_strnstr.c ft_split.c \
 		 ft_strtrim.c ft_isalnum.c ft_isascii.c ft_strmapi.c ft_striteri.c \
 		 ft_putchar_fd.c ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c \
-		 ft_itoa.c
+		 ft_itoa.c get_next_line.c get_next_line_utils.c
 
 BCFILES = ft_lstnew_bonus.c ft_lstadd_front_bonus.c ft_lstsize_bonus.c \
 		  ft_lstlast_bonus.c ft_lstadd_back_bonus.c ft_lstdelone_bonus.c \

@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/05/31 08:40:11 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/05/31 13:58:47 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,16 @@
 # define FDF_H
 
 # include	"minilibx_macos/mlx.h"
+# include	"libft/libft.h"
 # include	<math.h>
 # include	<float.h>
 # include	<stdio.h>
 # include	<stdlib.h>
 
+# define X	0
+# define Y	1
+# define Z	2
+# define C	3
 # define WINW 	1920
 # define WINH 	1080
 # define D_PI	6.2831
@@ -82,15 +87,23 @@ typedef struct	s_img {
 	int		bpp;
 	int		line_length;
 	int		endian;
-}				t_img;
+}			t_img;
+
+typedef struct s_coords{
+	int	x;
+	int	y;
+	int	z;
+	int	color;
+}		t_coords;
 
 typedef struct s_fdf{
-	void	*mlx_ptr;
-	void	*win_ptr;
-	t_img	b_ground;
-	int		map_W;
-	int		map_H;
-}			t_fdf;
+	void		*mlx_ptr;
+	void		*win_ptr;
+	t_img		b_ground;
+	int			map_W;
+	int			map_H;
+	t_coords	*coords;
+}				t_fdf;
 
 typedef struct s_point{
 	float	x;
@@ -118,6 +131,16 @@ typedef struct s_circle{
 	int		n;
 	int		max;
 }			t_circle;
+
+typedef struct s_bresenham{
+	t_point	i_pt;
+	t_point	f_pt;
+	int	d;
+	int	dx;
+	int	dy;
+	int i_one;
+	int	i_two;
+}			t_bresenham;
 
 void	draw_welcome_menu(t_fdf *fdf);
 
