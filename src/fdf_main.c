@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/05/31 09:18:10 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/05/31 13:51:55 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	init_img_data(t_img *img, void *mlx)
 void	init_fdf(t_fdf *fdf)
 {
 	fdf->mlx_ptr = mlx_init();
-	fdf->win_ptr = mlx_new_window(fdf->mlx_ptr, WINW, WINH, "TEST");
+	fdf->win_ptr = mlx_new_window(fdf->mlx_ptr, WINW, WINH, "FDF");
 }
 
 int	trgb_color(int t, int r, int g, int b)
@@ -184,9 +184,12 @@ void	draw_circle_outward(float center_x, float center_y, int radius, int outer_r
 
 void	close_all(t_fdf *fdf)
 {
-	mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
-	mlx_destroy_window(fdf->mlx_ptr, fdf->win_ptr);
-	mlx_destroy(fdf->mlx_ptr);
+	if (fdf->b_ground.img_ptr)
+		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
+	if (fdf->win_ptr)
+		mlx_destroy_window(fdf->mlx_ptr, fdf->win_ptr);
+	if (fdf->mlx_ptr)
+		mlx_destroy(fdf->mlx_ptr);
 	exit(0);
 }
 
@@ -254,6 +257,8 @@ void	draw_sides(t_fdf *fdf, float extent, float y_start, float y_finish, int col
 	while (pt.x < extent)
 	{
 		pt.y = y_base;
+		//set_fade(&pt, pt.og_color, BLACK, WINH * 0.25);
+		//while (pt.y < WINH * 0.25)
 		while (pt.y < y_finish)
 		{
 			my_mlx_pixel_put(&fdf->b_ground, pt.x, pt.y, pt.color);
@@ -277,58 +282,118 @@ void	draw_welcome_menu(t_fdf *fdf)
 	my_string_put(fdf, CENTER_X - 30, CENTER_Y + 20, CYAN_GULF, "=======");
 }
 
+void	get_map_width(t_fdf *fdf, int map)
+{
+	char	*line;
+	char	**list;
+	int		i;
+
+	i = 0;
+	line = get_next_line(map);
+	list = ft_split(line, ' ');
+	while (list[i] != NULL)
+		i++;
+	fdf->map_W = i;
+}
+
+void	get_map_height(t_fdf *fdf, int map)
+{
+	char	*line;
+	int		i;
+
+	i = 0;
+	line = get_next_line(map);
+	if (line)
+		i++;
+	while (line != NULL)
+	{
+		line = get_next_line(map);
+		i++;	
+	}
+	fdf->map_H = i;
+}
+
+int	check_color(char *str)
+{
+	while (*str != '\0')
+	{
+		if (*str == ',')
+			return (1);
+		str++;
+	}
+	return (0);
+	
+}
+
+void	get_map_coords(t_fdf *fdf, int map)
+{
+	char	**temp;
+	char	*line;
+	int		i;
+	int		j;
+	int		aux;
+
+	i = 0;
+	j = 0;
+	aux = 0;
+	fdf->coords = (t_coords *)malloc((fdf->map_W * fdf->map_H)); //??
+	if (!fdf->coords)
+		exit(1);
+	line = get_next_line(map);
+	while (j < fdf->map_H)
+	{
+		temp = ft_split(line, ' ');
+		while (temp[i] != NULL)
+		{
+			if (check_color(temp[i]))
+			{
+				//fdf->coords[i].color = ft_atoi((ft_split(temp[i], ',')[1]));
+				temp[i] = (ft_split(temp[i], ',')[0]);
+			}
+			fdf->coords[i].x = i;
+			fdf->coords[i].y = j;
+			fdf->coords[i].z = ft_atoi(temp[i]);
+		}	
+		line = get_next_line(map);	
+		j++;
+	}
+}
+
+void	process_map(t_fdf *fdf, int map)
+{
+	get_map_width(fdf, map);
+	get_map_height(fdf, map);
+	get_map_coords(fdf, map);
+}
+void	calculate_bresenham(t_bresenham *bres)
+{
+	
+}
+
+void	init_bresenham_line(t_point i_pt, t_point f_pt)
+{
+	t_bresenham	bres;
+
+	bres.dx = bres.fx - bres.ix;
+	bres.dy = bres.fy - bres.iy;
+	bres.i_one = 2 * bres.dy;
+	bres.i_two = 2 * (bres.dy - bres.dx);
+	bres.d = bres.i_one - bres.dx;
+	calculate_bresenham(bres);
+}
+
 int	main(void)
 {
 	t_fdf	fdf;
-	t_point	pt;
-	t_img	img;
-	float	x_base;
-	float	y_base;
-	int		img_width;
-	int		img_height;
+	//t_img	img;
+	//int	img_width;
+	//int	img_height;
 
 	init_fdf(&fdf);
-	//draw_welcome_menu(&fdf);
-	img.img_ptr = mlx_xpm_file_to_image(fdf.mlx_ptr, "./test2.xpm", &img_width, &img_height);
-	mlx_put_image_to_window(fdf.mlx_ptr, fdf.win_ptr, img.img_ptr, 0, 0);
-		
-	x_base = 0;
-	y_base = 0;
-	pt.x = x_base;
-	pt.y = y_base;
-	pt.og_color = ORANGE_GULF;
-	/*set_fade(&pt, pt.og_color, BLACK, WINW * 0.25);
-	while (pt.x < WINW * 0.25)
-	{
-		pt.y = y_base;
-		while (pt.y < WINH)
-		{
-			my_mlx_pixel_put(&fdf.b_ground, pt.x, pt.y, pt.color);
-			my_mlx_pixel_put(&fdf.b_ground, ((WINW - 1) - pt.x), ((WINH - 1) - pt.y), pt.color);
-			pt.y++;
-		}
-		pt.color = fade_color(&pt);
-		pt.x++;
-	}*/
-	/*
-	pt.x = 0;
-	pt.y = 0;
-	while (pt.x < WINW)
-	{
-		pt.y = y_base;
-		set_fade(&pt, pt.og_color, BLACK, WINH * 0.25);
-		while (pt.y < WINH * 0.25)
-		{
-			my_mlx_pixel_put(&fdf.b_ground, pt.x, pt.y, pt.color);
-			my_mlx_pixel_put(&fdf.b_ground, ((WINW - 1) - pt.x), ((WINH - 1) - pt.y), pt.color);
-			pt.color = fade_color(&pt);
-			pt.y++;
-		}
-		pt.x++;
-	}*/
-	//draw_circle_outward(CENTER_X, CENTER_Y, 500, 1300, 6000, BLACK, ORANGE_GULF, 0.85, &fdf.b_ground);
-	//draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 6000, BLACK, CYAN_GULF, 0.85, &fdf.b_ground);
-	//mlx_put_image_to_window(fdf.mlx_ptr, fdf.win_ptr, fdf.b_ground.img_ptr, 0, 0);
+	//process_map(&fdf, argv[1]);
+	draw_welcome_menu(&fdf);
+	//img.img_ptr = mlx_xpm_file_to_image(fdf.mlx_ptr, "./test2.xpm", &img_width, &img_height);
+	//mlx_put_image_to_window(fdf.mlx_ptr, fdf.win_ptr, img.img_ptr, 0, 0);
 	mlx_hook(fdf.win_ptr, KEYUP, 0, key_hook, (void *)&fdf);
 	mlx_loop(fdf.mlx_ptr);
 }

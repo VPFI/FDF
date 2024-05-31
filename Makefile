@@ -6,7 +6,7 @@
 #    By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/23 13:59:42 by vperez-f          #+#    #+#              #
-#    Updated: 2024/05/24 19:15:26 by vperez-f         ###   ########.fr        #
+#    Updated: 2024/05/31 10:04:48 by vperez-f         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,7 +34,7 @@ ARLIB = ar rc
 
 RM = rm -f
 
-%.o: src/%.c $(PATH_LFT) $(PATH_MLX) Makefile
+%.o: src/%.c $(PATH_LFT) $(PATH_MLX) fdf.h Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
 
 all: extra_make $(NAME)
