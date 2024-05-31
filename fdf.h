@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/05/31 03:54:08 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/05/31 08:40:11 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,37 @@
 # define YELLOW 0xF4DD5B
 # define DARK_GOLD 0xDAA520
 # define GOLD 0xFFD700
+
+# define ESC_KEY 0x35
+# define PLUS_KEY 0x45
+# define MINUS_KEY 0x4E
+# define ONE_KEY 0x12
+# define TWO_KEY 0x13
+# define THREE_KEY 0x14
+# define O_KEY 0x1F
+# define P_KEY 0x23
+# define A_KEY 0x00
+# define S_KEY 0x01
+# define D_KEY 0x02
+# define W_KEY 0x0D
+# define T_KEY 0x11
+# define X_KEY 0x07
+# define Y_KEY 0x10
+# define Z_KEY 0x06
+# define N_KEY 0x2D
+# define M_KEY 0x2E
+# define G_KEY 0x05
+# define C_KEY 0x08
+# define I_KEY 0x22
+# define H_KEY 0x04
+
+# define KEYDOWN 2
+# define KEYUP 3
+# define MOUSEDOWN 4
+# define MOUSEUP 5
+# define MOUSEMOVE 6
+# define EXPOSE 12
+# define DESTROY 17
 
 typedef struct	s_img {
 	void	*img_ptr;
@@ -87,5 +118,7 @@ typedef struct s_circle{
 	int		n;
 	int		max;
 }			t_circle;
+
+void	draw_welcome_menu(t_fdf *fdf);
 
 #endif

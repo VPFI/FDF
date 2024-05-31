@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/05/31 04:13:54 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/05/31 08:44:21 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,31 +182,119 @@ void	draw_circle_outward(float center_x, float center_y, int radius, int outer_r
 	}		
 }
 
-int	main(void)
+void	close_all(t_fdf *fdf)
 {
-	t_fdf	fdf;
-	t_img	img;
+	mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
+	mlx_destroy_window(fdf->mlx_ptr, fdf->win_ptr);
+	mlx_destroy(fdf->mlx_ptr);
+	exit(0);
+}
+
+void	draw_scene_one(t_fdf *fdf)
+{
+	//add img_ptr as param make it generic
+	mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
+	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
+	draw_circle_outward(CENTER_X, CENTER_Y, 500, 1300, 6000, BLACK, ORANGE_GULF, 0.85, &fdf->b_ground);
+	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
+}
+void	draw_scene_two(t_fdf *fdf)
+{
+	mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
+	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
+	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 6000, BLACK, CYAN_GULF, 0.85, &fdf->b_ground);
+	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
+}
+void	draw_scene_three(t_fdf *fdf)
+{
+	mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
+	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
+	draw_circle_outward(CENTER_X, CENTER_Y, 500, 1300, 6000, BLACK, ORANGE_GULF, 0.85, &fdf->b_ground);	
+	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 6000, BLACK, CYAN_GULF, 0.85, &fdf->b_ground);
+	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
+}
+
+int	key_hook(int keycode, void *fdf)
+{
+	if (keycode == 53)
+		close_all(fdf);
+	else if (keycode == ONE_KEY)
+		draw_scene_one(fdf);
+	else if (keycode == TWO_KEY)
+		draw_scene_two(fdf);
+	else if (keycode == THREE_KEY)
+		draw_scene_three(fdf);
+	else if (keycode == M_KEY)
+		draw_welcome_menu(fdf);
+	return (0);
+}
+
+void	my_string_put(t_fdf *fdf, int x, int y, int color, char *msg)
+{
+	mlx_string_put(fdf->mlx_ptr, fdf->win_ptr, x, y, color, msg);
+}
+
+void	draw_sides(t_fdf *fdf, float extent, float y_start, float y_finish, int color1, int color2)
+{
 	t_point	pt;
 	float	x_base;
 	float	y_base;
-	float	ratio;
+	
+	x_base = 0;
+	y_base = WINH * y_start;
+	y_finish = WINH * y_finish;
+	extent = WINW * extent;
+	pt.x = x_base;
+	pt.y = y_base;
+	pt.og_color = color1;
+	set_fade(&pt, pt.og_color, color2, WINW * 0.25);
+	while (pt.x < extent)
+	{
+		pt.y = y_base;
+		while (pt.y < y_finish)
+		{
+			my_mlx_pixel_put(&fdf->b_ground, pt.x, pt.y, pt.color);
+			my_mlx_pixel_put(&fdf->b_ground, ((WINW - 1) - pt.x), ((WINH - 1) - pt.y), pt.color);
+			pt.y++;
+		}
+		pt.color = fade_color(&pt);
+		pt.x++;
+	}	
+}
+
+void	draw_welcome_menu(t_fdf *fdf)
+{
+	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
+	draw_sides(fdf, 0.5, 0, 1, ORANGE_GULF, BLACK);
+	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
+	my_string_put(fdf, CENTER_X, CENTER_Y- 25, CYAN_GULF, "|");
+	my_string_put(fdf, CENTER_X - 20, CENTER_Y, CYAN_GULF, "START");
+	my_string_put(fdf, CENTER_X - 30, CENTER_Y + 20, CYAN_GULF, "=======");
+}
+
+int	main(void)
+{
+	t_fdf	fdf;
+	t_point	pt;
+	float	x_base;
+	float	y_base;
 
 	init_fdf(&fdf);
-	init_img_data(&img, fdf.mlx_ptr);
+	draw_welcome_menu(&fdf);
+	
 	x_base = 0;
 	y_base = 0;
 	pt.x = x_base;
 	pt.y = y_base;
 	pt.og_color = ORANGE_GULF;
-	ratio = WINW * 0.25;
 	/*set_fade(&pt, pt.og_color, BLACK, WINW * 0.25);
 	while (pt.x < WINW * 0.25)
 	{
 		pt.y = y_base;
 		while (pt.y < WINH)
 		{
-			my_mlx_pixel_put(&img, pt.x, pt.y, pt.color);
-			my_mlx_pixel_put(&img, ((WINW - 1) - pt.x), ((WINH - 1) - pt.y), pt.color);
+			my_mlx_pixel_put(&fdf.b_ground, pt.x, pt.y, pt.color);
+			my_mlx_pixel_put(&fdf.b_ground, ((WINW - 1) - pt.x), ((WINH - 1) - pt.y), pt.color);
 			pt.y++;
 		}
 		pt.color = fade_color(&pt);
@@ -221,15 +309,16 @@ int	main(void)
 		set_fade(&pt, pt.og_color, BLACK, WINH * 0.25);
 		while (pt.y < WINH * 0.25)
 		{
-			my_mlx_pixel_put(&img, pt.x, pt.y, pt.color);
-			my_mlx_pixel_put(&img, ((WINW - 1) - pt.x), ((WINH - 1) - pt.y), pt.color);
+			my_mlx_pixel_put(&fdf.b_ground, pt.x, pt.y, pt.color);
+			my_mlx_pixel_put(&fdf.b_ground, ((WINW - 1) - pt.x), ((WINH - 1) - pt.y), pt.color);
 			pt.color = fade_color(&pt);
 			pt.y++;
 		}
 		pt.x++;
 	}*/
-	draw_circle_outward(CENTER_X, CENTER_Y, 500, 1300, 6000, BLACK, ORANGE_GULF, 0.85, &img);
-	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 6000, BLACK, CYAN_GULF, 0.85, &img);
-	mlx_put_image_to_window(fdf.mlx_ptr, fdf.win_ptr, img.img_ptr, 0, 0);
+	//draw_circle_outward(CENTER_X, CENTER_Y, 500, 1300, 6000, BLACK, ORANGE_GULF, 0.85, &fdf.b_ground);
+	//draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 6000, BLACK, CYAN_GULF, 0.85, &fdf.b_ground);
+	//mlx_put_image_to_window(fdf.mlx_ptr, fdf.win_ptr, fdf.b_ground.img_ptr, 0, 0);
+	mlx_hook(fdf.win_ptr, KEYUP, 0, key_hook, (void *)&fdf);
 	mlx_loop(fdf.mlx_ptr);
 }
