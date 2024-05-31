@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/05/31 01:46:26 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/05/31 02:29:38 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,16 +163,18 @@ int	main(void)
 	circle.center_y = WINH / 2;
 	circle.radius = 500;
 	circle.degree = 0;
-	circle.smothness = 1000;
+	circle.smothness = 10000;
 	circle.increment = PI / circle.smothness;
-	circle.color = ORANGE_GULF;
+	circle.og_color = BLACK;
 	int hipo = (int)sqrt((WINW * WINW) + (WINH * WINH));
+	set_fade_circle(&circle, circle.og_color, ORANGE_GULF, circle.radius * 0.85);
 	//circle.radius + circle.center_x < (WINW) || circle.radius + circle.center_y < (WINH)
 	while (circle.radius < hipo)
 	{
 		circle.degree = 0;
 		circle.x = 0;
 		circle.y = 0;
+		circle.color = fade_color_circle(&circle);
 		while (circle.degree < D_PI)
 		{
 			circle.x = circle.center_x + (circle.radius * cos(circle.degree));
@@ -196,14 +198,16 @@ int	main(void)
 	circle.center_y = WINH / 2;
 	circle.radius = 490;
 	circle.degree = 0;
-	circle.smothness = 1000;
+	circle.smothness = 3000;
 	circle.increment = PI / circle.smothness;
-	circle.color = CYAN_GULF;
+	circle.og_color = BLACK;
+	set_fade_circle(&circle, circle.og_color, CYAN_GULF, circle.radius * 0.9);
 	while (0 < circle.radius)
 	{
 		circle.degree = 0;
 		circle.x = 0;
 		circle.y = 0;
+		circle.color = fade_color_circle(&circle);
 		while (circle.degree < D_PI)
 		{
 			circle.x = circle.center_x + (circle.radius * cos(circle.degree));
@@ -216,6 +220,7 @@ int	main(void)
 				circle.y = 0;
 			else if ((WINH) <= circle.y)
 				circle.y = WINH - 1;
+			//circle.color = fade_color_circle(&circle);
 			my_mlx_pixel_put(&img, circle.x, circle.y, circle.color);		
 			circle.degree += circle.increment;
 		}
