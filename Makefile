@@ -20,13 +20,17 @@ OFILES = $(CFILES:%.c=%.o)
 
 OBJ = $(OFILES)
 
+DIR_LIBFT = libft/ 
+
 PATH_LFT = libft/libft.a
 
-PATH_MLX = minilibx_macos/libmlx.a
+DIR_MLX = minilibx_linux/
+
+PATH_MLX = minilibx_linux/libmlx.a
 
 CFLAGS = -Wall -Wextra -Werror
 
-MLXFLAGS = -L$(minilibx_macos/) -lmlx -lm -framework OpenGL -framework AppKit
+MLXFLAGS = -L -lmlx -lXext -lX11 -lm
 
 CC = cc
 
@@ -43,7 +47,7 @@ extra_make:
 	@printf "LIBFT: COMPILING...\n$(END)"
 	@$(MAKE) -C libft/ --no-print-directory
 	@printf "MINILIBX: COMPILING...\n$(END)"
-	@$(MAKE) -C minilibx_macos/ --no-print-directory
+	@$(MAKE) -C minilibx_linux/ --no-print-directory
 
 $(NAME): $(OFILES) $(PATH_LFT) $(PATH_MLX)
 	@$(CC) $(CFLAGS) $(OFILES) $(PATH_LFT) $(PATH_MLX) $(MLXFLAGS) -o $(NAME)
@@ -51,17 +55,17 @@ $(NAME): $(OFILES) $(PATH_LFT) $(PATH_MLX)
 
 debug: $(OFILES) 
 	@$(MAKE) -C libft/
-	@$(MAKE) -C minilibx_macos/
+	@$(MAKE) -C minilibx_linux/
 	@$(CC) -g $(CFLAGS) $(OFILES) $(PATH_LFT) -o $(NAME)
 
 clean:
 	@$(MAKE) -C libft/ clean --no-print-directory
-	@$(MAKE) -C minilibx_macos/ clean --no-print-directory
+	@$(MAKE) -C minilibx_linux/ clean --no-print-directory
 	@$(RM) $(OBJ)
 
 fclean:	clean
 	@$(MAKE) -C libft/ fclean --no-print-directory
-	@$(MAKE) -C minilibx_macos/ fclean --no-print-directory
+	@$(MAKE) -C minilibx_linux/ fclean --no-print-directory
 	@$(RM) $(NAME)
 
 re:	fclean all

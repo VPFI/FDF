@@ -6,14 +6,14 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/05/31 13:58:47 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/05 18:10:05 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FDF_H
 # define FDF_H
 
-# include	"minilibx_macos/mlx.h"
+# include	"minilibx_linux/mlx.h"
 # include	"libft/libft.h"
 # include	<math.h>
 # include	<float.h>
@@ -50,12 +50,14 @@
 # define DARK_GOLD 0xDAA520
 # define GOLD 0xFFD700
 
-# define ESC_KEY 0x35
+# define ESC_KEY 0xff1b
 # define PLUS_KEY 0x45
 # define MINUS_KEY 0x4E
-# define ONE_KEY 0x12
-# define TWO_KEY 0x13
-# define THREE_KEY 0x14
+# define ONE_KEY 0x31
+# define TWO_KEY 0x32
+# define THREE_KEY 0x33
+# define FOUR_KEY 0x34
+# define FIVE_KEY 0x35
 # define O_KEY 0x1F
 # define P_KEY 0x23
 # define A_KEY 0x00
@@ -67,11 +69,13 @@
 # define Y_KEY 0x10
 # define Z_KEY 0x06
 # define N_KEY 0x2D
-# define M_KEY 0x2E
+# define M_KEY 0x6d
 # define G_KEY 0x05
 # define C_KEY 0x08
 # define I_KEY 0x22
 # define H_KEY 0x04
+
+//Get linux mask stuff here...
 
 # define KEYDOWN 2
 # define KEYUP 3

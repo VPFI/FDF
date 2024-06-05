@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/05/31 14:01:15 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/05 18:22:21 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,7 +189,7 @@ void	close_all(t_fdf *fdf)
 	if (fdf->win_ptr)
 		mlx_destroy_window(fdf->mlx_ptr, fdf->win_ptr);
 	if (fdf->mlx_ptr)
-		mlx_destroy(fdf->mlx_ptr);
+		mlx_destroy_display(fdf->mlx_ptr);
 	exit(0);
 }
 
@@ -202,6 +202,7 @@ void	draw_scene_one(t_fdf *fdf)
 	draw_circle_outward(CENTER_X, CENTER_Y, 500, 1300, 6000, BLACK, ORANGE_GULF, 0.85, &fdf->b_ground);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
+
 void	draw_scene_two(t_fdf *fdf)
 {
 	if (fdf->b_ground.img_ptr)
@@ -210,6 +211,7 @@ void	draw_scene_two(t_fdf *fdf)
 	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 6000, BLACK, CYAN_GULF, 0.85, &fdf->b_ground);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
+
 void	draw_scene_three(t_fdf *fdf)
 {
 	if (fdf->b_ground.img_ptr)
@@ -220,9 +222,31 @@ void	draw_scene_three(t_fdf *fdf)
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
 
+void	draw_scene_four(t_fdf *fdf)
+{
+	if (fdf->b_ground.img_ptr)
+		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
+	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
+	draw_circle_inward(CENTER_X, CENTER_Y, 1500, 0, 1000, WHITE, BLACK, 0.7, &fdf->b_ground);
+	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 300, BLACK, CYAN_GULF, 0.85, &fdf->b_ground);
+	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
+}
+
+void	draw_scene_five(t_fdf *fdf)
+{
+	if (fdf->b_ground.img_ptr)
+		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
+	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
+	draw_circle_outward(CENTER_X, CENTER_Y, 510, 1300, 900, ORANGE_GULF, ORANGE_GULF, 1, &fdf->b_ground);
+	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 400, CYAN_GULF, CYAN_GULF, 1, &fdf->b_ground);
+	draw_circle_outward(CENTER_X, CENTER_Y, 500, 510, 4000, BLACK, ORANGE_GULF, 0.03, &fdf->b_ground);
+	draw_circle_inward(CENTER_X, CENTER_Y, 500, 490, 4000, BLACK, CYAN_GULF, 0.03, &fdf->b_ground);
+	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
+}
+
 int	key_hook(int keycode, void *fdf)
 {
-	if (keycode == 53)
+	if (keycode == ESC_KEY)
 		close_all(fdf);
 	else if (keycode == ONE_KEY)
 		draw_scene_one(fdf);
@@ -230,6 +254,10 @@ int	key_hook(int keycode, void *fdf)
 		draw_scene_two(fdf);
 	else if (keycode == THREE_KEY)
 		draw_scene_three(fdf);
+	else if (keycode == FOUR_KEY)
+		draw_scene_four(fdf);
+	else if (keycode == FIVE_KEY)
+		draw_scene_five(fdf);
 	else if (keycode == M_KEY)
 		draw_welcome_menu(fdf);
 	return (0);
@@ -272,14 +300,12 @@ void	draw_sides(t_fdf *fdf, float extent, float y_start, float y_finish, int col
 
 void	draw_welcome_menu(t_fdf *fdf)
 {
-	if (fdf->b_ground.img_ptr)
-		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
 	draw_sides(fdf, 0.5, 0, 1, ORANGE_GULF, BLACK);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 	my_string_put(fdf, CENTER_X, CENTER_Y- 25, CYAN_GULF, "|");
-	my_string_put(fdf, CENTER_X - 20, CENTER_Y, CYAN_GULF, "START");
-	my_string_put(fdf, CENTER_X - 30, CENTER_Y + 20, CYAN_GULF, "=======");
+	my_string_put(fdf, CENTER_X - 11, CENTER_Y, CYAN_GULF, "START");
+	my_string_put(fdf, CENTER_X - 17, CENTER_Y + 20, CYAN_GULF, "=======");
 }
 
 void	get_map_width(t_fdf *fdf, int map)
@@ -365,6 +391,7 @@ void	process_map(t_fdf *fdf, int map)
 	get_map_height(fdf, map);
 	get_map_coords(fdf, map);
 }
+/*
 void	calculate_bresenham(t_bresenham *bres)
 {
 	if (bres->dx < 0)
@@ -386,7 +413,7 @@ void	init_bresenham_line(t_point i_pt, t_point f_pt)
 	bres.d = bres.i_one - bres.dx;
 	calculate_bresenham(bres);
 }
-
+*/
 int	main(void)
 {
 	t_fdf	fdf;
@@ -399,6 +426,6 @@ int	main(void)
 	draw_welcome_menu(&fdf);
 	//img.img_ptr = mlx_xpm_file_to_image(fdf.mlx_ptr, "./test2.xpm", &img_width, &img_height);
 	//mlx_put_image_to_window(fdf.mlx_ptr, fdf.win_ptr, img.img_ptr, 0, 0);
-	mlx_hook(fdf.win_ptr, KEYUP, 0, key_hook, (void *)&fdf);
+	mlx_hook(fdf.win_ptr, KEYUP, (1L<<1), key_hook, (void *)&fdf);
 	mlx_loop(fdf.mlx_ptr);
 }
