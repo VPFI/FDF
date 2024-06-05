@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/05 18:22:21 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/05 20:17:43 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -308,35 +308,39 @@ void	draw_welcome_menu(t_fdf *fdf)
 	my_string_put(fdf, CENTER_X - 17, CENTER_Y + 20, CYAN_GULF, "=======");
 }
 
-void	get_map_width(t_fdf *fdf, int map)
+void	get_map_width(t_fdf *fdf, char *map_addr)
 {
 	char	*line;
 	char	**list;
 	int		i;
+	int		map;
 
 	i = 0;
+	map = open(map_addr, O_RDONLY);
 	line = get_next_line(map);
 	list = ft_split(line, ' ');
 	while (list[i] != NULL)
 		i++;
 	fdf->map_W = i;
+	close(map);
 }
 
-void	get_map_height(t_fdf *fdf, int map)
+void	get_map_height(t_fdf *fdf, char *map_addr)
 {
 	char	*line;
 	int		i;
+	int		map;
 
 	i = 0;
+	map = open(map_addr, O_RDONLY);
 	line = get_next_line(map);
-	if (line)
-		i++;
 	while (line != NULL)
 	{
-		line = get_next_line(map);
 		i++;	
+		line = get_next_line(map);
 	}
 	fdf->map_H = i;
+	close(map);
 }
 
 int	check_color(char *str)
@@ -351,45 +355,59 @@ int	check_color(char *str)
 	
 }
 
-void	get_map_coords(t_fdf *fdf, int map)
+void	get_map_coords(t_fdf *fdf, char *map_addr)
 {
 	char	**temp;
 	char	*line;
 	int		i;
 	int		j;
 	int		aux;
+	int		map;
 
 	i = 0;
 	j = 0;
 	aux = 0;
+	map = open(map_addr, O_RDONLY);
 	fdf->coords = (t_coords *)malloc((fdf->map_W * fdf->map_H)); //??
 	if (!fdf->coords)
 		exit(1);
 	line = get_next_line(map);
 	while (j < fdf->map_H)
 	{
-		temp = ft_split(line, ' ');
+		temp = ft_split(line, ' '); // check... free asdad
+		i = 0;
 		while (temp[i] != NULL)
 		{
 			if (check_color(temp[i]))
 			{
 				//fdf->coords[i].color = ft_atoi((ft_split(temp[i], ',')[1]));
-				temp[i] = (ft_split(temp[i], ',')[0]);
+				//temp[i] = (ft_split(temp[i], ',')[0]);
 			}
 			fdf->coords[i].x = i;
 			fdf->coords[i].y = j;
 			fdf->coords[i].z = ft_atoi(temp[i]);
+			i++;
 		}	
-		line = get_next_line(map);	
+		line = get_next_line(map);
 		j++;
 	}
+	close(map);
 }
 
-void	process_map(t_fdf *fdf, int map)
+void	process_map(t_fdf *fdf, char *map_addr)
 {
-	get_map_width(fdf, map);
-	get_map_height(fdf, map);
-	get_map_coords(fdf, map);
+	get_map_width(fdf, map_addr);
+	get_map_height(fdf, map_addr);
+	printf("W%i -- H%i\n", fdf->map_W, fdf->map_H);
+	get_map_coords(fdf, map_addr);
+	int n = fdf->map_W * fdf->map_H;
+	int i = 0;
+	printf("%i -- %i\n", n, i);
+	while (i < n)
+	{
+		printf("X:%i -- Y:%i -- Z:%i |||| %i\n", fdf->coords[i].x, fdf->coords[i].y, fdf->coords[i].z, i);
+		i++;
+	}
 }
 /*
 void	calculate_bresenham(t_bresenham *bres)
@@ -414,15 +432,17 @@ void	init_bresenham_line(t_point i_pt, t_point f_pt)
 	calculate_bresenham(bres);
 }
 */
-int	main(void)
+int	main(int argc, char **argv)
 {
 	t_fdf	fdf;
 	//t_img	img;
 	//int	img_width;
 	//int	img_height;
 
-	init_fdf(&fdf);
-	//process_map(&fdf, argv[1]);
+	argc = 0;
+	if (argv[0])
+		init_fdf(&fdf);
+	process_map(&fdf, argv[1]);
 	draw_welcome_menu(&fdf);
 	//img.img_ptr = mlx_xpm_file_to_image(fdf.mlx_ptr, "./test2.xpm", &img_width, &img_height);
 	//mlx_put_image_to_window(fdf.mlx_ptr, fdf.win_ptr, img.img_ptr, 0, 0);
