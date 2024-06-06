@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/05 19:45:20 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/06 19:56:04 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@
 # define THREE_KEY 0x33
 # define FOUR_KEY 0x34
 # define FIVE_KEY 0x35
+# define SIX_KEY 0x36
 # define O_KEY 0x1F
 # define P_KEY 0x23
 # define A_KEY 0x00
@@ -94,9 +95,9 @@ typedef struct	s_img {
 }			t_img;
 
 typedef struct s_coords{
-	int	x;
-	int	y;
-	int	z;
+	float	x;
+	float	y;
+	float	z;
 	int	color;
 }		t_coords;
 
@@ -137,8 +138,8 @@ typedef struct s_circle{
 }			t_circle;
 
 typedef struct s_bresenham{
-	t_point	i_pt;
-	t_point	f_pt;
+	t_coords	i_pt;
+	t_coords	f_pt;
 	int	d;
 	int	dx;
 	int	dy;
@@ -147,5 +148,6 @@ typedef struct s_bresenham{
 }			t_bresenham;
 
 void	draw_welcome_menu(t_fdf *fdf);
+void	init_bresenham_line(t_fdf *fdf, t_coords *i_pt, t_coords *f_pt);
 
 #endif
