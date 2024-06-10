@@ -6,28 +6,29 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/06 19:56:04 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/10 20:42:02 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FDF_H
 # define FDF_H
 
-# include	"minilibx_linux/mlx.h"
-# include	"libft/libft.h"
-# include	<math.h>
-# include	<float.h>
-# include	<stdio.h>
-# include	<stdlib.h>
+# include   "minilibx_linux/mlx.h"
+# include   "libft/libft.h"
+# include   <math.h>
+# include   <float.h>
+# include   <stdio.h>
+# include   <stdlib.h>
 
-# define X	0
-# define Y	1
-# define Z	2
-# define C	3
-# define WINW 	1920
-# define WINH 	1080
-# define D_PI	6.2831
-# define PI		3.1416
+# define X  0
+# define Y  1
+# define Z  2
+# define C  3
+# define WINW   1920
+# define WINH   1080
+# define D_PI   6.2831
+# define PI     3.1416
+# define H_PI   1.5708
 # define CENTER_X WINW / 2
 # define CENTER_Y WINH / 2
 
@@ -59,6 +60,7 @@
 # define FOUR_KEY 0x34
 # define FIVE_KEY 0x35
 # define SIX_KEY 0x36
+# define SEVEN_KEY 0x37
 # define O_KEY 0x1F
 # define P_KEY 0x23
 # define A_KEY 0x00
@@ -86,68 +88,73 @@
 # define EXPOSE 12
 # define DESTROY 17
 
-typedef struct	s_img {
-	void	*img_ptr;
-	char	*addr;
-	int		bpp;
-	int		line_length;
-	int		endian;
-}			t_img;
+typedef struct  s_img {
+    void    *img_ptr;
+    char    *addr;
+    int     bpp;
+    int     line_length;
+    int     endian;
+}           t_img;
 
 typedef struct s_coords{
-	float	x;
-	float	y;
-	float	z;
-	int	color;
-}		t_coords;
+    float   x;
+    float   y;
+    float   z;
+    int color;
+}       t_coords;
 
 typedef struct s_fdf{
-	void		*mlx_ptr;
-	void		*win_ptr;
-	t_img		b_ground;
-	int			map_W;
-	int			map_H;
-	t_coords	*coords;
-}				t_fdf;
+    void        *mlx_ptr;
+    void        *win_ptr;
+    t_img       b_ground;
+    int         map_W;
+    int         map_H;
+    int         map_size;
+    int         spacing_W;
+    int         spacing_H;
+    t_coords    *map;
+}               t_fdf;
 
 typedef struct s_point{
-	float	x;
-	float	y;
-	float	z;
-	int		color;
-	int		og_color;
-	float	fade_comp[4];
-	int		n;
-	int		max;
-}			t_point;
+    float   x;
+    float   y;
+    float   z;
+    int     color;
+    int     og_color;
+    float   fade_comp[4];
+    int     n;
+    int     max;
+}           t_point;
 
 typedef struct s_circle{
-	float	x;
-	float	y;
-	float	center_x;
-	float	center_y;
-	int		radius;
-	float	degree;
-	float	smothness;
-	float	increment;
-	int		color;
-	int		og_color;
-	float	fade_comp[4];
-	int		n;
-	int		max;
-}			t_circle;
+    float   x;
+    float   y;
+    float   center_x;
+    float   center_y;
+    int     radius;
+    float   degree;
+    float   smothness;
+    float   increment;
+    int     color;
+    int     og_color;
+    float   fade_comp[4];
+    int     n;
+    int     max;
+}           t_circle;
 
 typedef struct s_bresenham{
-	t_coords	i_pt;
-	t_coords	f_pt;
-	int	d;
-	int	dx;
-	int	dy;
-	int i_one;
-	int	i_two;
-}			t_bresenham;
+    t_coords    i_pt;
+    t_coords    f_pt;
+    int d;
+    int d2;
+    int dx;
+    int dy;
+    int i_one;
+    int i_two;
+}           t_bresenham;
 
-void	draw_welcome_menu(t_fdf *fdf);
-void	init_bresenham_line(t_fdf *fdf, t_coords *i_pt, t_coords *f_pt);
+void    draw_welcome_menu(t_fdf *fdf);
+void    init_bresenham_line(t_img *img, t_coords *i_pt, t_coords *f_pt);
+void    fancy_circle(t_img *img, int xm, int ym, int r);
 
 #endif
