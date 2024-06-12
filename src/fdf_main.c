@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/10 21:26:10 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/12 22:01:51 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,11 @@ void    init_fdf(t_fdf *fdf)
 {
 	fdf->mlx_ptr = mlx_init();
 	fdf->win_ptr = mlx_new_window(fdf->mlx_ptr, WINW, WINH, "FDF");
+	fdf->rot_deg_x = 0;
+	fdf->rot_deg_y = 0;
+	fdf->rot_deg_z = 0;
+	fdf->tras_x = 0;
+	fdf->tras_y = 0;
 }
 
 int trgb_color(int t, int r, int g, int b)
@@ -297,9 +302,9 @@ void    draw_map(t_fdf *fdf)
 	if (fdf->b_ground.img_ptr)
 		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
-	while (j < fdf->map_H - 1)
+	while (j < fdf->map_edges_H)
 	{
-		while ((i % fdf->map_W) < fdf->map_W - 1)
+		while ((i % fdf->map_W) < fdf->map_edges_W)
 		{
 			i_pt = fdf->map[i];
 			f_pt = fdf->map[i + 1];
@@ -314,14 +319,102 @@ void    draw_map(t_fdf *fdf)
 		i++;
 		j++;
 	}
-	while ((i % fdf->map_W) < fdf->map_W - 1)
+	while ((i % fdf->map_W) < fdf->map_edges_W)
 	{
 		i_pt = fdf->map[i];
 		f_pt = fdf->map[i + 1];
 		init_bresenham_line(&fdf->b_ground, &i_pt, &f_pt);
 		i++;
 	}
+	/*
+	i_pt.x = WINW / 2;
+	i_pt.y = 0;
+	f_pt.x = WINW / 2;
+	f_pt.y = WINH;
+	init_bresenham_line(&fdf->b_ground, &i_pt, &f_pt);
+	i_pt.x = 0;
+	i_pt.y = WINH / 2;
+	f_pt.x = WINW;
+	f_pt.y = WINH / 2;
+	init_bresenham_line(&fdf->b_ground, &i_pt, &f_pt);
+	*/
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
+}
+
+void	reset_map(t_fdf *fdf)
+{
+	int	i;
+	
+	i = 0;
+	while (i < fdf->map_size)
+	{
+		fdf->map[i] = fdf->backup_map[i];
+		i++;
+	}	
+}
+
+void	rotate_key(t_fdf *fdf, int angle_x, int angle_y, int angle_z)
+{
+	reset_map(fdf);
+	rotate_map(fdf, angle_x, angle_y ,angle_z);
+	scale_map(fdf);
+	draw_map(fdf);
+}
+
+void	move_key(t_fdf *fdf, int dist, int dir)
+{
+	int	i;
+
+	i = 0;
+	printf("------X: %i -- Y: %i ||| DIST: %i\n", fdf->tras_x, fdf->tras_y, dist);
+	printf("PIXEL X: %f -- Y: %f ||| DIST: %i\n", fdf->map[i].x, fdf->map[i].y, dist);
+	while (i < fdf->map_size)
+	{
+		if (dir)
+		{
+			fdf->tras_y += dist;
+			fdf->map[i].y += dist;
+		}
+		else if (!dir)
+		{
+			fdf->tras_x += dist;
+			fdf->map[i].x += dist;
+		}
+		i++;
+	}
+	printf("++++++X: %i -- Y: %i ||| DIST: %i\n", fdf->tras_x, fdf->tras_y, dist);
+	printf("PIXEL X: %f -- Y: %f ||| DIST: %i\n", fdf->map[i-1].x, fdf->map[i-1].y, dist);
+	printf("--------------------------------------------\n");
+	draw_map(fdf);
+}
+
+
+void	swap_persp(t_fdf *fdf, int p)
+{
+	int	angle_x;
+	int	angle_y;
+	int	angle_z;
+
+
+	angle_x = 0;
+	angle_y = 0;
+	angle_z = 0;
+	if (p == 1)
+	{
+		angle_x = -fdf->rot_deg_x;
+		angle_y = -fdf->rot_deg_y;
+		angle_z = -fdf->rot_deg_z;
+	}
+	else if (p == 2)
+	{
+		angle_x = 90 -fdf->rot_deg_x;
+		angle_y = -fdf->rot_deg_y;
+		angle_z = -fdf->rot_deg_z;
+	}
+	reset_map(fdf);
+	rotate_map(fdf, angle_x, angle_y ,angle_z);
+	scale_map(fdf);
+	draw_map(fdf);
 }
 
 int key_hook(int keycode, void *fdf)
@@ -344,6 +437,30 @@ int key_hook(int keycode, void *fdf)
 		draw_map(fdf);
 	else if (keycode == M_KEY)
 		draw_welcome_menu(fdf);
+	else if (keycode == W_KEY)
+		rotate_key(fdf, 5, 0, 0);
+	else if (keycode == S_KEY)
+		rotate_key(fdf, -5, 0, 0);
+	else if (keycode == D_KEY)
+		rotate_key(fdf, 0, 5, 0);
+	else if (keycode == A_KEY)
+		rotate_key(fdf, 0, -5,0);
+	else if (keycode == Q_KEY)
+		rotate_key(fdf, 0, 0, 5);
+	else if (keycode == E_KEY)
+		rotate_key(fdf, 0, 0, -5);
+	else if (keycode == O_KEY)
+		swap_persp(fdf, 1);
+	else if (keycode == P_KEY)
+		swap_persp(fdf, 2);
+	else if (keycode == UP_KEY)
+		move_key(fdf, -20, 1);
+	else if (keycode == DOWN_KEY)
+		move_key(fdf, 20, 1);
+	else if (keycode == LEFT_KEY)
+		move_key(fdf, -20, 0);
+	else if (keycode == RIGHT_KEY)
+		move_key(fdf, 20, 0);
 	return (0);
 }
 
@@ -395,6 +512,7 @@ void    draw_welcome_menu(t_fdf *fdf)
 void    get_map_width(t_fdf *fdf, char *map_addr)
 {
 	char    *line;
+	char    *temp_line;
 	char    **list;
 	int     i;
 	int     map;
@@ -402,7 +520,9 @@ void    get_map_width(t_fdf *fdf, char *map_addr)
 	i = 0;
 	map = open(map_addr, O_RDONLY);
 	line = get_next_line(map);
-	list = ft_split(line, ' ');
+	temp_line = ft_strtrim(line, "\n");
+	list = ft_split(temp_line, ' ');
+	free(temp_line);
 	while (list[i] != NULL)
 		i++;
 	fdf->map_W = i;
@@ -449,6 +569,7 @@ void    get_map_coords(t_fdf *fdf, char *map_addr)
 {
 	char    **temp;
 	char    *line;
+	char	*temp_line;
 	int     i;
 	int     j;
 	int     aux;
@@ -457,16 +578,20 @@ void    get_map_coords(t_fdf *fdf, char *map_addr)
 	i = 0;
 	j = 0;
 	temp = NULL;
+	temp_line = NULL;
 	aux = 0;
 	map = open(map_addr, O_RDONLY);
 	fdf->map = (t_coords *)malloc(sizeof(t_coords) * (fdf->map_W * fdf->map_H));
-	if (!fdf->map)
+	fdf->backup_map = (t_coords *)malloc(sizeof(t_coords) * (fdf->map_W * fdf->map_H));
+	if (!fdf->map || !fdf->backup_map)
 		exit(1);
 	line = get_next_line(map);
 	while (j < fdf->map_H)
 	{
 		free_arr(temp);
-		temp = ft_split(line, ' ');
+		temp_line = ft_strtrim(line, "\n");
+		temp = ft_split(temp_line, ' ');
+		free(temp_line);
 		i = 0;
 		while (temp[i] != NULL)
 		{
@@ -476,9 +601,12 @@ void    get_map_coords(t_fdf *fdf, char *map_addr)
 				fdf->map[i].color = ft_atoi((ft_split(temp[i], ',')[1]));
 				temp[i] = (ft_split(temp[i], ',')[0]);
 			}*/
-			fdf->map[aux].x = (WINW * 0.125) + (fdf->spacing_W * i) + 200;
-			fdf->map[aux].y = (WINH * 0.125) + fdf->spacing_H + (fdf->spacing_H * j) - 600;
-			fdf->map[aux].z = ft_atoi(temp[i]) * 10;
+			fdf->map[aux].x = i;
+			fdf->map[aux].y = j;
+			fdf->map[aux].z = ft_atoi(temp[i]);
+			fdf->backup_map[aux].x = i;
+			fdf->backup_map[aux].y = j;
+			fdf->backup_map[aux].z = ft_atoi(temp[i]);
 			i++;
 			aux++;
 		}
@@ -495,39 +623,80 @@ void    get_map_coords(t_fdf *fdf, char *map_addr)
 
 void	rotate_x(t_coords *pt, float angle)
 {
+	float	temp_y;
+	float	temp_z;
+
 	if (!angle)
 		return ;
-	pt->y = (pt->y * cos(angle)) + (pt->z * (-sin(angle)));
-	pt->z = (pt->y * sin(angle)) + (pt->z * cos(angle));
+	temp_y = pt->y;
+	temp_z = pt->z;
+	pt->y = (temp_y * cos(angle)) + (temp_z * (-sin(angle)));
+	pt->z = (temp_y * sin(angle)) + (temp_z * cos(angle));
 }
 
 void	rotate_y(t_coords *pt, float angle)
 {
+	float	temp_x;
+	float	temp_z;
+
 	if (!angle)
 		return ;
-	pt->x = (pt->x * cos(angle)) - (pt->z * sin(angle));
-	pt->z = (pt->x * (-sin(angle))) + (pt->z * cos(angle));
+	temp_x = pt->x;
+	temp_z = pt->z;
+	pt->x = (temp_x * cos(angle)) + (temp_z * sin(angle));
+	pt->z = (temp_x * (-sin(angle))) + (temp_z * cos(angle));
 }
 
 void	rotate_z(t_coords *pt, float angle)
 {
+	float	temp_x;
+	float	temp_y;
+
 	if (!angle)
 		return ;
-	pt->x = (pt->x * cos(angle)) + (pt->y * (-sin(angle)));
-	pt->y = (pt->x * sin(angle)) - (pt->y * cos(angle));	
+	temp_x = pt->x; 
+	temp_y = pt->y;
+	pt->x = (temp_x * cos(angle)) + (temp_y * (-sin(angle)));
+	pt->y = (temp_x * sin(angle)) + (temp_y * cos(angle));
 }
 
-void	rotate_map(t_fdf *fdf, float angle_x, float angle_y, float angle_z)
+void	rotate_map(t_fdf *fdf, int deg_x, int deg_y, int deg_z)
 {
 	int	i;
+	float	angle_x;
+	float	angle_y;
+	float	angle_z;
 
 	i = 0;
+	fdf->rot_deg_x += deg_x; 
+	fdf->rot_deg_y += deg_y;
+	fdf->rot_deg_z += deg_z;
+	fdf->rot_deg_x = fdf->rot_deg_x % 360; 
+	fdf->rot_deg_y = fdf->rot_deg_y % 360;
+	fdf->rot_deg_z = fdf->rot_deg_z % 360;
+	printf("x: %i -- y: %i -- z: %i\n", fdf->rot_deg_x, fdf->rot_deg_y, fdf->rot_deg_z);
+	angle_x = fdf->rot_deg_x * PI / 180;
+	angle_y = fdf->rot_deg_y * PI / 180;
+	angle_z = fdf->rot_deg_z * PI / 180;
 	while (i < fdf->map_size)
 	{
 		rotate_x(&fdf->map[i], angle_x);
 		rotate_y(&fdf->map[i], angle_y);
 		rotate_z(&fdf->map[i], angle_z);
-		//asdasdasdasdasda
+		i++;
+	}
+}
+
+void	scale_map(t_fdf *fdf)
+{
+	int	i;
+
+	i = 0;
+	printf("X: %i -- Y: %i\n", fdf->tras_x, fdf->tras_y);
+	while (i < fdf->map_size)
+	{
+		fdf->map[i].x = (CENTER_X / 4) + (fdf->spacing_W * fdf->map[i].x) + fdf->tras_x;
+		fdf->map[i].y = (CENTER_Y / 4) + (fdf->spacing_H * fdf->map[i].y) + fdf->tras_y;
 		i++;
 	}
 }
@@ -536,18 +705,21 @@ void    process_map(t_fdf *fdf, char *map_addr)
 {
 	get_map_width(fdf, map_addr);
 	get_map_height(fdf, map_addr);
-	fdf->spacing_W = (WINW * 0.75) / fdf->map_W;
-	fdf->spacing_H = (WINH * 0.75) / fdf->map_H;
 	fdf->map_size = fdf->map_H * fdf->map_W;
+	printf("SIZE: %i\n", fdf->map_size);
+	fdf->map_edges_W = fdf->map_W - 1;
+	fdf->map_edges_H = fdf->map_H - 1;
+	fdf->spacing_W = (WINW * 0.75) / (fdf->map_edges_W);
+	fdf->spacing_H = (WINH * 0.75) / (fdf->map_edges_H);
 	get_map_coords(fdf, map_addr);
-	rotate_map(fdf, PI/6, 0, PI/6);
+	rotate_map(fdf, 45, 0, 45);
+	scale_map(fdf);
 	/*
 	int i = 0;
-	printf("%i -- %i\n", n, i);
-
+	printf("%i\n", i);
 	while (i < fdf->map_size)
 	{
-		printf("X:%f -- Y:%f -- Z:%f |||| %i\n", fdf->map[i].x, fdf->map[i].y, fdf->map[i].z, i);
+		printf("X:%f -- Y:%f -- Z:%f |||| %i\n", fdf->backup_map[i].x, fdf->backup_map[i].y, fdf->backup_map[i].z, i);
 		i++;
 	}*/
 }
