@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/10 20:42:02 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/12 21:58:10 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,8 @@
 # define Y  1
 # define Z  2
 # define C  3
-# define WINW   1920
-# define WINH   1080
+# define WINW   2000
+# define WINH   1500
 # define D_PI   6.2831
 # define PI     3.1416
 # define H_PI   1.5708
@@ -61,22 +61,25 @@
 # define FIVE_KEY 0x35
 # define SIX_KEY 0x36
 # define SEVEN_KEY 0x37
-# define O_KEY 0x1F
-# define P_KEY 0x23
-# define A_KEY 0x00
-# define S_KEY 0x01
-# define D_KEY 0x02
-# define W_KEY 0x0D
-# define T_KEY 0x11
-# define X_KEY 0x07
-# define Y_KEY 0x10
-# define Z_KEY 0x06
-# define N_KEY 0x2D
+# define LEFT_KEY 0xff51
+# define UP_KEY 0xff52
+# define RIGHT_KEY 0xff53
+# define DOWN_KEY 0xff54
+# define DOWN_KEY 0xff54
+# define DOWN_KEY 0xff54
+# define DOWN_KEY 0xff54
+# define W_KEY 0x0077
+# define A_KEY 0x0061
+# define S_KEY 0x0073
+# define D_KEY 0x0064
 # define M_KEY 0x6d
-# define G_KEY 0x05
-# define C_KEY 0x08
-# define I_KEY 0x22
-# define H_KEY 0x04
+# define Q_KEY 0x71
+# define E_KEY 0x65
+# define T_KEY 0x74
+# define G_KEY 0x67
+# define O_KEY 0x6f
+# define P_KEY 0x70
+
 
 //Get linux mask stuff here...
 
@@ -89,72 +92,85 @@
 # define DESTROY 17
 
 typedef struct  s_img {
-    void    *img_ptr;
-    char    *addr;
-    int     bpp;
-    int     line_length;
-    int     endian;
+	void    *img_ptr;
+	char    *addr;
+	int     bpp;
+	int     line_length;
+	int     endian;
 }           t_img;
 
 typedef struct s_coords{
-    float   x;
-    float   y;
-    float   z;
-    int color;
+	float   x;
+	float   y;
+	float   z;
+	int color;
 }       t_coords;
 
 typedef struct s_fdf{
-    void        *mlx_ptr;
-    void        *win_ptr;
-    t_img       b_ground;
-    int         map_W;
-    int         map_H;
-    int         map_size;
-    int         spacing_W;
-    int         spacing_H;
-    t_coords    *map;
+	void        *mlx_ptr;
+	void        *win_ptr;
+	t_img       b_ground;
+	int         map_W;
+	int         map_H;
+	int         map_edges_W;
+	int         map_edges_H;
+	int         map_size;
+	float       spacing_W;
+	float       spacing_H;
+	int			tras_x;
+	int			tras_y;
+	int         rot_deg_x;
+	int         rot_deg_y;
+	int         rot_deg_z;
+	t_coords    *map;
+	t_coords    *backup_map;
 }               t_fdf;
 
 typedef struct s_point{
-    float   x;
-    float   y;
-    float   z;
-    int     color;
-    int     og_color;
-    float   fade_comp[4];
-    int     n;
-    int     max;
+	float   x;
+	float   y;
+	float   z;
+	int     color;
+	int     og_color;
+	float   fade_comp[4];
+	int     n;
+	int     max;
 }           t_point;
 
 typedef struct s_circle{
-    float   x;
-    float   y;
-    float   center_x;
-    float   center_y;
-    int     radius;
-    float   degree;
-    float   smothness;
-    float   increment;
-    int     color;
-    int     og_color;
-    float   fade_comp[4];
-    int     n;
-    int     max;
+	float   x;
+	float   y;
+	float   center_x;
+	float   center_y;
+	int     radius;
+	float   degree;
+	float   smothness;
+	float   increment;
+	int     color;
+	int     og_color;
+	float   fade_comp[4];
+	int     n;
+	int     max;
 }           t_circle;
 
 typedef struct s_bresenham{
-    t_coords    i_pt;
-    t_coords    f_pt;
-    int d;
-    int d2;
-    int dx;
-    int dy;
-    int i_one;
-    int i_two;
+	t_coords    i_pt;
+	t_coords    f_pt;
+	int d;
+	int d2;
+	int dx;
+	int dy;
+	int i_one;
+	int i_two;
 }           t_bresenham;
 
 void    draw_welcome_menu(t_fdf *fdf);
 void    init_bresenham_line(t_img *img, t_coords *i_pt, t_coords *f_pt);
 void    fancy_circle(t_img *img, int xm, int ym, int r);
+void	rotate_x(t_coords *pt, float angle);
+void	rotate_y(t_coords *pt, float angle);
+void	rotate_z(t_coords *pt, float angle);
+void	rotate_map(t_fdf *fdf, int deg_x, int deg_y, int deg_z);
+void	scale_map(t_fdf *fdf);
 
 #endif
