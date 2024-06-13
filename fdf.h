@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/12 21:58:10 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/13 16:07:27 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@
 # define G_KEY 0x67
 # define O_KEY 0x6f
 # define P_KEY 0x70
+# define R_KEY 0x72
 
 
 //Get linux mask stuff here...
