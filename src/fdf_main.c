@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/13 16:40:02 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/13 19:47:42 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ void    init_fdf(t_fdf *fdf)
 	fdf->rot_deg_z = 0;
 	fdf->tras_x = 0;
 	fdf->tras_y = 0;
+	fdf->zoom = 0.7;
 }
 
 int trgb_color(int t, int r, int g, int b)
@@ -579,6 +580,20 @@ int check_color(char *str)
 	}
 	return (0);
 }
+void	get_backup_map(t_fdf *fdf)
+{
+	int	i;
+
+	i = 0;
+	fdf->backup_map = (t_coords *)malloc(sizeof(t_coords) * (fdf->map_size));
+	if (!fdf->backup_map)
+		exit (1);
+	while (i < fdf->map_size)
+	{
+		fdf->backup_map[i] = fdf->map[i];
+		i++;
+	}
+}
 
 void    get_map_coords(t_fdf *fdf, char *map_addr)
 {
@@ -596,9 +611,8 @@ void    get_map_coords(t_fdf *fdf, char *map_addr)
 	temp_line = NULL;
 	aux = 0;
 	map = open(map_addr, O_RDONLY);
-	fdf->map = (t_coords *)malloc(sizeof(t_coords) * (fdf->map_W * fdf->map_H));
-	fdf->backup_map = (t_coords *)malloc(sizeof(t_coords) * (fdf->map_W * fdf->map_H));
-	if (!fdf->map || !fdf->backup_map)
+	fdf->map = (t_coords *)malloc(sizeof(t_coords) * (fdf->map_size));
+	if (!fdf->map)
 		exit(1);
 	line = get_next_line(map);
 	while (j < fdf->map_H)
@@ -619,9 +633,6 @@ void    get_map_coords(t_fdf *fdf, char *map_addr)
 			fdf->map[aux].x = i;
 			fdf->map[aux].y = j;
 			fdf->map[aux].z = ft_atoi(temp[i]);
-			fdf->backup_map[aux].x = i;
-			fdf->backup_map[aux].y = j;
-			fdf->backup_map[aux].z = ft_atoi(temp[i]);
 			i++;
 			aux++;
 		}
@@ -699,16 +710,44 @@ void	rotate_map(t_fdf *fdf, int deg_x, int deg_y, int deg_z)
 	}
 }
 
+void	set_position(t_fdf *fdf)
+{
+	int	i;
+	int	j;
+	int	index;
+	int	aux_W;
+	int	aux_H;
+
+	i = 0;
+	j = 0;
+	index = 0;
+	aux_W = -(fdf->map_W / 2);
+	aux_H = -(fdf->map_H / 2);
+	while (j < fdf->map_H)
+	{
+		i = 0;
+		while (i < fdf->map_W)
+		{
+			fdf->map[index].x = aux_W + i;
+			printf("aux :%i -- i: %i || POINT: %f\n",aux_W, i, fdf->map[i].x);
+			fdf->map[index].y = aux_H + j;
+			i++;
+			index++;
+		}
+		j++;
+	}
+}
+
 void	scale_map(t_fdf *fdf)
 {
 	int	i;
 
 	i = 0;
-	printf("-----SCALE || X: %i -- Y: %i\n", fdf->tras_x, fdf->tras_y);
+	printf("SCALE || X: %i -- Y: %i\n", fdf->tras_x, fdf->tras_y);
 	while (i < fdf->map_size)
 	{
-		fdf->map[i].x = (CENTER_X / 4) + (fdf->spacing_W * fdf->map[i].x) + fdf->tras_x;
-		fdf->map[i].y = (CENTER_Y / 4) + (fdf->spacing_H * fdf->map[i].y) + fdf->tras_y;
+		fdf->map[i].x = (CENTER_X) + (fdf->spacing_W * fdf->map[i].x) + fdf->tras_x;
+		fdf->map[i].y = (CENTER_Y) + (fdf->spacing_H * fdf->map[i].y) + fdf->tras_y;
 		i++;
 	}
 }
@@ -721,19 +760,21 @@ void    process_map(t_fdf *fdf, char *map_addr)
 	printf("SIZE: %i\n", fdf->map_size);
 	fdf->map_edges_W = fdf->map_W - 1;
 	fdf->map_edges_H = fdf->map_H - 1;
-	fdf->spacing_W = (WINW * 0.75) / (fdf->map_edges_W);
-	fdf->spacing_H = (WINH * 0.75) / (fdf->map_edges_H);
+	fdf->spacing_W = (WINW * fdf->zoom) / (fdf->map_edges_W);
+	fdf->spacing_H = (WINH * fdf->zoom) / (fdf->map_edges_H);
 	get_map_coords(fdf, map_addr);
-	scale_map(fdf);
-	//rotate_map(fdf, 45, 0, 45);
-	/*
+	set_position(fdf);
+	get_backup_map(fdf);
+	//scale_map(fdf);
+
 	int i = 0;
 	printf("%i\n", i);
 	while (i < fdf->map_size)
 	{
-		printf("X:%f -- Y:%f -- Z:%f |||| %i\n", fdf->backup_map[i].x, fdf->backup_map[i].y, fdf->backup_map[i].z, i);
+		printf("---------- X:%f -- Y:%f -- Z:%f |||| %i\n", fdf->map[i].x, fdf->map[i].y, fdf->map[i].z, i);
+		printf("BACKUP --- X:%f -- Y:%f -- Z:%f |||| %i\n", fdf->backup_map[i].x, fdf->backup_map[i].y, fdf->backup_map[i].z, i);
 		i++;
-	}*/
+	}
 }
 
 void    fancy_circle(t_img *img, int xm, int ym, int r)
