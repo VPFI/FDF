@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/13 22:02:02 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/13 22:08:17 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -337,8 +337,7 @@ void    draw_map(t_fdf *fdf)
 	i_pt.y = WINH / 2;
 	f_pt.x = WINW;
 	f_pt.y = WINH / 2;
-	init_bresenham_line(&fdf->b_ground, &i_pt, &f_pt);
-	*/
+	init_bresenham_line(&fdf->b_ground, &i_pt, &f_pt);*/
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
 
