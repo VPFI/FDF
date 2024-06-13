@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/12 22:01:51 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/13 16:40:02 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -326,7 +326,7 @@ void    draw_map(t_fdf *fdf)
 		init_bresenham_line(&fdf->b_ground, &i_pt, &f_pt);
 		i++;
 	}
-	/*
+	
 	i_pt.x = WINW / 2;
 	i_pt.y = 0;
 	f_pt.x = WINW / 2;
@@ -337,7 +337,7 @@ void    draw_map(t_fdf *fdf)
 	f_pt.x = WINW;
 	f_pt.y = WINH / 2;
 	init_bresenham_line(&fdf->b_ground, &i_pt, &f_pt);
-	*/
+	
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
 
@@ -366,28 +366,28 @@ void	move_key(t_fdf *fdf, int dist, int dir)
 	int	i;
 
 	i = 0;
-	printf("------X: %i -- Y: %i ||| DIST: %i\n", fdf->tras_x, fdf->tras_y, dist);
-	printf("PIXEL X: %f -- Y: %f ||| DIST: %i\n", fdf->map[i].x, fdf->map[i].y, dist);
 	while (i < fdf->map_size)
 	{
 		if (dir)
-		{
-			fdf->tras_y += dist;
 			fdf->map[i].y += dist;
-		}
 		else if (!dir)
-		{
-			fdf->tras_x += dist;
 			fdf->map[i].x += dist;
-		}
 		i++;
 	}
-	printf("++++++X: %i -- Y: %i ||| DIST: %i\n", fdf->tras_x, fdf->tras_y, dist);
-	printf("PIXEL X: %f -- Y: %f ||| DIST: %i\n", fdf->map[i-1].x, fdf->map[i-1].y, dist);
-	printf("--------------------------------------------\n");
+	if (dir)
+		fdf->tras_y += dist;
+	else if (!dir)
+		fdf->tras_x += dist;
+	printf("MOVE || X: %i -- Y: %i\n", fdf->tras_x, fdf->tras_y);
 	draw_map(fdf);
 }
 
+void	set_angles(int *angle_x, int *angle_y, int *angle_z)
+{
+	*angle_x = 0;
+	*angle_y = 0;
+	*angle_z = 0;		
+}
 
 void	swap_persp(t_fdf *fdf, int p)
 {
@@ -395,17 +395,14 @@ void	swap_persp(t_fdf *fdf, int p)
 	int	angle_y;
 	int	angle_z;
 
-
-	angle_x = 0;
-	angle_y = 0;
-	angle_z = 0;
+	set_angles(&angle_x, &angle_y, &angle_z);
 	if (p == 1)
 	{
 		angle_x = -fdf->rot_deg_x;
 		angle_y = -fdf->rot_deg_y;
 		angle_z = -fdf->rot_deg_z;
 	}
-	else if (p == 2)
+	if (p == 2)
 	{
 		angle_x = 90 -fdf->rot_deg_x;
 		angle_y = -fdf->rot_deg_y;
@@ -414,6 +411,22 @@ void	swap_persp(t_fdf *fdf, int p)
 	reset_map(fdf);
 	rotate_map(fdf, angle_x, angle_y ,angle_z);
 	scale_map(fdf);
+	draw_map(fdf);
+}
+
+void	reset_pos(t_fdf *fdf)
+{
+	int	i;
+
+	i = 0;
+	while (i < fdf->map_size)
+	{
+		fdf->map[i].x -= fdf->tras_x;
+		fdf->map[i].y -= fdf->tras_y;
+		i++;
+	}
+	fdf->tras_x = 0;
+	fdf->tras_y = 0;
 	draw_map(fdf);
 }
 
@@ -449,6 +462,8 @@ int key_hook(int keycode, void *fdf)
 		rotate_key(fdf, 0, 0, 5);
 	else if (keycode == E_KEY)
 		rotate_key(fdf, 0, 0, -5);
+	else if (keycode == R_KEY)
+		reset_pos(fdf);
 	else if (keycode == O_KEY)
 		swap_persp(fdf, 1);
 	else if (keycode == P_KEY)
@@ -668,13 +683,10 @@ void	rotate_map(t_fdf *fdf, int deg_x, int deg_y, int deg_z)
 	float	angle_z;
 
 	i = 0;
-	fdf->rot_deg_x += deg_x; 
-	fdf->rot_deg_y += deg_y;
-	fdf->rot_deg_z += deg_z;
-	fdf->rot_deg_x = fdf->rot_deg_x % 360; 
-	fdf->rot_deg_y = fdf->rot_deg_y % 360;
-	fdf->rot_deg_z = fdf->rot_deg_z % 360;
-	printf("x: %i -- y: %i -- z: %i\n", fdf->rot_deg_x, fdf->rot_deg_y, fdf->rot_deg_z);
+	fdf->rot_deg_x = (fdf->rot_deg_x + deg_x) % 360; 
+	fdf->rot_deg_y = (fdf->rot_deg_y + deg_y) % 360;
+	fdf->rot_deg_z = (fdf->rot_deg_z + deg_z) % 360;
+	printf("ROTATE || x: %i -- y: %i -- z: %i\n", fdf->rot_deg_x, fdf->rot_deg_y, fdf->rot_deg_z);
 	angle_x = fdf->rot_deg_x * PI / 180;
 	angle_y = fdf->rot_deg_y * PI / 180;
 	angle_z = fdf->rot_deg_z * PI / 180;
@@ -692,7 +704,7 @@ void	scale_map(t_fdf *fdf)
 	int	i;
 
 	i = 0;
-	printf("X: %i -- Y: %i\n", fdf->tras_x, fdf->tras_y);
+	printf("-----SCALE || X: %i -- Y: %i\n", fdf->tras_x, fdf->tras_y);
 	while (i < fdf->map_size)
 	{
 		fdf->map[i].x = (CENTER_X / 4) + (fdf->spacing_W * fdf->map[i].x) + fdf->tras_x;
@@ -712,8 +724,8 @@ void    process_map(t_fdf *fdf, char *map_addr)
 	fdf->spacing_W = (WINW * 0.75) / (fdf->map_edges_W);
 	fdf->spacing_H = (WINH * 0.75) / (fdf->map_edges_H);
 	get_map_coords(fdf, map_addr);
-	rotate_map(fdf, 45, 0, 45);
 	scale_map(fdf);
+	//rotate_map(fdf, 45, 0, 45);
 	/*
 	int i = 0;
 	printf("%i\n", i);
