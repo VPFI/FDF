@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/13 17:08:54 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/13 20:17:09 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@
 # define E_KEY 0x65
 # define T_KEY 0x74
 # define G_KEY 0x67
+# define I_KEY 0x69
 # define O_KEY 0x6f
 # define P_KEY 0x70
 # define R_KEY 0x72
@@ -118,11 +119,8 @@ typedef struct s_fdf{
 	int         map_size;
 	float       spacing_W;
 	float       spacing_H;
-	int			tras_x;
-	int			tras_y;
-	int         rot_deg_x;
-	int         rot_deg_y;
-	int         rot_deg_z;
+	int			tras[2];
+	int			rot_deg[3];
 	float		zoom;
 	t_coords    *map;
 	t_coords    *backup_map;
