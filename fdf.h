@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/13 16:07:27 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/13 17:08:54 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,7 @@ typedef struct s_fdf{
 	int         rot_deg_x;
 	int         rot_deg_y;
 	int         rot_deg_z;
+	float		zoom;
 	t_coords    *map;
 	t_coords    *backup_map;
 }               t_fdf;
