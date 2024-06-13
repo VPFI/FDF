@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/13 20:17:52 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/13 22:02:02 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -435,6 +435,40 @@ void	reset_pos(t_fdf *fdf)
 	draw_map(fdf);
 }
 
+void	extrude(t_fdf *fdf, float dist)
+{
+	int	i;
+
+	i = 0;
+	while (i < fdf->map_size)
+	{
+		fdf->map[i].z *= dist;
+		i++;
+	}
+	draw_map(fdf);
+}
+
+void	zoom_map(t_fdf *fdf, float amount)
+{
+	fdf->zoom *= amount;
+	if (0 < fdf->zoom && fdf->zoom < 50)
+	{
+		reset_map(fdf);
+		rotate_map(fdf, 0, 0, 0);
+		scale_map(fdf);
+		draw_map(fdf);
+	}
+}
+
+void	reset_zoom(t_fdf *fdf)
+{
+	fdf->zoom = 0.7;
+	reset_map(fdf);
+	rotate_map(fdf, 0, 0, 0);
+	scale_map(fdf);
+	draw_map(fdf);
+}
+
 int key_hook(int keycode, void *fdf)
 {
 	if (keycode == ESC_KEY)
@@ -475,6 +509,16 @@ int key_hook(int keycode, void *fdf)
 		swap_persp(fdf, 2);
 	else if (keycode == I_KEY)
 		swap_persp(fdf, 3);
+	else if (keycode == T_KEY)
+		extrude(fdf, 1.1);
+	else if (keycode == G_KEY)
+		extrude(fdf, 0.9);
+	else if (keycode == COMMA_KEY)
+		zoom_map(fdf, 0.9);
+	else if (keycode == PERIOD_KEY)
+		zoom_map(fdf, 1.1);
+	else if (keycode == SLASH_KEY)
+		reset_zoom(fdf);
 	else if (keycode == UP_KEY)
 		move_key(fdf, -20, 1);
 	else if (keycode == DOWN_KEY)
@@ -749,7 +793,8 @@ void	scale_map(t_fdf *fdf)
 	int	i;
 
 	i = 0;
-	//printf("SCALE || X: %i -- Y: %i\n", fdf->tras[X], fdf->tras[Y]);
+	fdf->spacing_W = (WINW * fdf->zoom) / (fdf->map_edges_W);
+	fdf->spacing_H = (WINH * fdf->zoom) / (fdf->map_edges_H);
 	while (i < fdf->map_size)
 	{
 		fdf->map[i].x = (CENTER_X) + (fdf->spacing_W * fdf->map[i].x) + fdf->tras[X];
@@ -766,8 +811,6 @@ void    process_map(t_fdf *fdf, char *map_addr)
 	printf("SIZE: %i\n", fdf->map_size);
 	fdf->map_edges_W = fdf->map_W - 1;
 	fdf->map_edges_H = fdf->map_H - 1;
-	fdf->spacing_W = (WINW * fdf->zoom) / (fdf->map_edges_W);
-	fdf->spacing_H = (WINH * fdf->zoom) / (fdf->map_edges_H);
 	get_map_coords(fdf, map_addr);
 	set_position(fdf);
 	get_backup_map(fdf);
