@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/13 20:17:09 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/13 21:57:06 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,9 @@
 # define O_KEY 0x6f
 # define P_KEY 0x70
 # define R_KEY 0x72
+# define COMMA_KEY 0x2c
+# define PERIOD_KEY 0x2e
+# define SLASH_KEY 0x2f
 
 
 //Get linux mask stuff here...
