@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/14 13:18:16 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/14 14:38:15 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,7 +208,7 @@ void    draw_circle_outward(float center_x, float center_y, int radius, int oute
 	}
 }
 
-void    close_all(t_fdf *fdf)
+int	close_all(t_fdf *fdf)
 {
 	if (fdf->b_ground.img_ptr)
 		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
@@ -217,6 +217,7 @@ void    close_all(t_fdf *fdf)
 	if (fdf->mlx_ptr)
 		mlx_destroy_display(fdf->mlx_ptr);
 	exit(0);
+	return (0);
 }
 
 void    draw_scene_one(t_fdf *fdf)
@@ -449,15 +450,16 @@ void	extrude(t_fdf *fdf, float dist)
 
 void	zoom_map(t_fdf *fdf, float amount)
 {
+	if (fdf->zoom < 0.05 && amount < 1)
+		return ;
+	if (50 < fdf->zoom && 1 < amount)
+		return ;
 	fdf->zoom *= amount;
-	if (0 < fdf->zoom && fdf->zoom < 50)
-	{
-		reset_map(fdf);
-		rotate_map(fdf, 0, 0, 0);
-		scale_map(fdf);
-		draw_map(fdf);
-		printf("ZOOM || Z: %f\n", fdf->zoom);
-	}
+	reset_map(fdf);
+	rotate_map(fdf, 0, 0, 0);
+	scale_map(fdf);
+	draw_map(fdf);
+	printf("ZOOM || Z: %f\n", fdf->zoom);
 }
 
 void	reset_zoom(t_fdf *fdf)
@@ -575,6 +577,14 @@ void    draw_welcome_menu(t_fdf *fdf)
 	my_string_put(fdf, CENTER_X - 17, CENTER_Y + 20, CYAN_GULF, "=======");
 }
 
+void	file_err(char *addr)
+{
+	ft_printf(STDERR_FILENO, "\n    Unexpected error opening: (%s)\n", addr);
+	ft_printf(2, "  Please make sure the input follows correct formatting:\n");
+	ft_printf(STDERR_FILENO, "         --|| ./fdf map_address.fdf ||--\n\n");
+	exit(2);
+}
+
 void    get_map_width(t_fdf *fdf, char *map_addr)
 {
 	char    *line;
@@ -585,6 +595,8 @@ void    get_map_width(t_fdf *fdf, char *map_addr)
 
 	i = 0;
 	map = open(map_addr, O_RDONLY);
+	if (map < 0)
+		file_err(map_addr);
 	line = get_next_line(map);
 	temp_line = ft_strtrim(line, "\n");
 	list = ft_split(temp_line, ' ');
@@ -606,6 +618,8 @@ void    get_map_height(t_fdf *fdf, char *map_addr)
 
 	i = 0;
 	map = open(map_addr, O_RDONLY);
+	if (map < 0)
+		file_err(map_addr);
 	line = get_next_line(map);
 	while (line != NULL)
 	{
@@ -661,6 +675,8 @@ void    get_map_coords(t_fdf *fdf, char *map_addr)
 	temp_line = NULL;
 	aux = 0;
 	map = open(map_addr, O_RDONLY);
+	if (map < 0)
+		file_err(map_addr);
 	fdf->map = (t_coords *)malloc(sizeof(t_coords) * (fdf->map_size));
 	if (!fdf->map)
 		exit(1);
@@ -900,6 +916,8 @@ int main(int argc, char **argv)
 	draw_welcome_menu(&fdf);
 	//img.img_ptr = mlx_xpm_file_to_image(fdf.mlx_ptr, "./test2.xpm", &img_width, &img_height);
 	//mlx_put_image_to_window(fdf.mlx_ptr, fdf.win_ptr, img.img_ptr, 0, 0);
-	mlx_hook(fdf.win_ptr, KEYDOWN, (1L<<1), key_hook, (void *)&fdf);
+	//mlx_mouse_hook();
+	mlx_hook(fdf.win_ptr, KEYDOWN, KEY_PRESS_M, key_hook, (void *)&fdf);
+	mlx_hook(fdf.win_ptr, DESTROY, 0, close_all, &fdf);
 	mlx_loop(fdf.mlx_ptr);
 }
