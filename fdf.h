@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/14 19:06:14 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/14 20:09:35 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 # define CENTER_X WINW / 2
 # define CENTER_Y WINH / 2
 
+# define DEFAULT_COLOR 0xFF6720
 # define WHITE 0xFFFFFF
 # define BLACK 0x0
 # define GRAY_DARK 0x1A1A1A
@@ -88,8 +89,6 @@
 # define SPACE_KEY 0x20
 # define SHIFT_KEY 0xffe1
 
-
-//Get linux mask stuff here...
 # define KEYPRESS_M (1L<<0)
 # define KEYRELEASE_M (1L<<1)
 # define MOUSEPRESS_M (1L<<2)
@@ -117,8 +116,8 @@ typedef struct s_coords{
 	float   x;
 	float   y;
 	float   z;
-	int color;
-}       t_coords;
+	int 	color;
+}       	t_coords;
 
 typedef struct s_fdf{
 	void        *mlx_ptr;
@@ -177,13 +176,17 @@ typedef struct s_circle{
 typedef struct s_bresenham{
 	t_coords    i_pt;
 	t_coords    f_pt;
-	int d;
-	int d2;
-	int dx;
-	int dy;
-	int i_one;
-	int i_two;
-}           t_bresenham;
+	int 		d;
+	int 		d2;
+	int 		dx;
+	int 		dy;
+	int 		i_one;
+	int 		i_two;
+	int     	n;
+	int     	max;
+	int			color;
+	float   	fade_comp[4];
+}           	t_bresenham;
 
 void    draw_welcome_menu(t_fdf *fdf);
 void    init_bresenham_line(t_img *img, t_coords *i_pt, t_coords *f_pt);
