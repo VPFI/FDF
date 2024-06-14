@@ -6,7 +6,7 @@
 #    By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/23 13:59:42 by vperez-f          #+#    #+#              #
-#    Updated: 2024/06/12 17:00:19 by vperez-f         ###   ########.fr        #
+#    Updated: 2024/06/14 13:16:49 by vperez-f         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,7 @@ DIR_MLX = minilibx_linux/
 
 PATH_MLX = minilibx_linux/libmlx.a
 
-CFLAGS = -Wall -Wextra -Werror -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -O3 #-fsanitize=address -fsanitize=leak
 
 MLXFLAGS = -L -lmlx -lXext -lX11 -lm
 
