@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/14 19:17:21 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/14 21:58:23 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,45 @@ int fade_color(t_point *pt)
 	g = g_color(pt->og_color) + (pt->fade_comp[2] * pt->n);
 	b = b_color(pt->og_color) + (pt->fade_comp[3] * pt->n);
 	pt->n++;
+	return (trgb_color(t, r, g, b));
+}
+
+int		modulo(float v1, float v2)
+{
+	int	res;
+
+	res = round(sqrtf((v1 * v1) + (v2 * v2)));
+	return (res);
+}
+
+void    set_fade_bres(t_bresenham *bres)
+{
+	float	dist_x;
+	float	dist_y;
+
+	dist_x = bres->f_pt.x - bres->i_pt.x;
+	dist_y = bres->f_pt.y - bres->i_pt.y;
+	bres->max = modulo(dist_x, dist_y);
+	bres->fade_comp[1] = (float)((r_color(bres->i_pt.color)) - (r_color(bres->f_pt.color)))/bres->max;
+	bres->fade_comp[2] = (float)((g_color(bres->i_pt.color)) - (g_color(bres->f_pt.color)))/bres->max;
+	bres->fade_comp[3] = (float)((b_color(bres->i_pt.color)) - (b_color(bres->f_pt.color)))/bres->max;
+	bres->n = 1;
+}
+
+int fade_color_bres(t_bresenham *bres)
+{
+	int t;
+	int r;
+	int g;
+	int b;
+
+	if (bres->n == bres->max)
+		return (bres->color);
+	t = t_color(bres->i_pt.color);
+	r = r_color(bres->i_pt.color) + (bres->fade_comp[1] * bres->n);
+	g = g_color(bres->i_pt.color) + (bres->fade_comp[2] * bres->n);
+	b = b_color(bres->i_pt.color) + (bres->fade_comp[3] * bres->n);
+	bres->n++;
 	return (trgb_color(t, r, g, b));
 }
 
@@ -416,15 +455,15 @@ void	swap_persp(t_fdf *fdf, int p)
 	}
 	if (p == 2)
 	{
-		angle[X] = 90 -fdf->rot_deg[X];
+		angle[X] = 90 - fdf->rot_deg[X];
 		angle[Y] = -fdf->rot_deg[Y];
 		angle[Z] = -fdf->rot_deg[Z];
 	}
 	if (p == 3)
 	{
-		angle[X] = 45 -fdf->rot_deg[X];
-		angle[Y] = -fdf->rot_deg[Y];
-		angle[Z] = 45 -fdf->rot_deg[Z];
+		angle[X] = 45 - fdf->rot_deg[X];
+		angle[Y] =  -fdf->rot_deg[Y];
+		angle[Z] = -15 - fdf->rot_deg[Z];
 	}
 	reset_map(fdf);
 	rotate_map(fdf, angle[X], angle[Y], angle[Z]);
@@ -485,7 +524,7 @@ void	reset_zoom(t_fdf *fdf)
 
 void	reset_all(t_fdf *fdf)
 {
-	int	i;
+	int		i;
 
 	i = 0;
 	fdf->z_factor = 1;
@@ -572,7 +611,7 @@ int	mouse_move(int x, int y, void *fdf_B)
 	if (fdf->is_left_mouse_pres && fdf->shift_tracker)
 		rotate_key(fdf, 0, 0, dist_x / 4 + dist_y / 4);
 	else if (fdf->is_left_mouse_pres)
-		rotate_key(fdf, dist_x / 2, dist_y / 2, 0);
+		rotate_key(fdf, dist_y / 2, dist_x / 2, 0);
 	fdf->mouse_x = x;
 	fdf->mouse_y = y;
 	//fdf->mouse_tracker = 0;
@@ -781,11 +820,14 @@ void    get_map_height(t_fdf *fdf, char *map_addr)
 
 int check_color(char *str)
 {
-	while (*str != '\0')
+	int i;
+
+	i = 0;
+	while (str[i] != '\0')
 	{
-		if (*str == ',')
+		if (str[i] == ',')
 			return (1);
-		str++;
+		i++;
 	}
 	return (0);
 }
@@ -802,6 +844,32 @@ void	get_backup_map(t_fdf *fdf)
 		fdf->backup_map[i] = fdf->map[i];
 		i++;
 	}
+}
+
+int	get_color(char *hexa_num)
+{
+	int		i;
+	int		j;
+	int		parsed_num;
+	char	c;
+	char	*base;
+
+	i = 0;
+	parsed_num = 0;
+	hexa_num = hexa_num + 2;
+	base = "0123456789abcdef";
+	while (hexa_num[i])
+	{
+		c = ft_tolower(hexa_num[i]);
+		j = 0;
+		while (base[j] && c != base[j])
+			j++;
+		if (j >= 16)
+			break ;
+		parsed_num = (parsed_num * 16) + j;
+		i++;
+	}
+	return (parsed_num);
 }
 
 void    get_map_coords(t_fdf *fdf, char *map_addr)
@@ -835,15 +903,13 @@ void    get_map_coords(t_fdf *fdf, char *map_addr)
 		i = 0;
 		while (temp[i] != NULL)
 		{
-			/*
-			if (check_color(temp[i]))
-			{
-				fdf->map[i].color = ft_atoi((ft_split(temp[i], ',')[1]));
-				temp[i] = (ft_split(temp[i], ',')[0]);
-			}*/
 			fdf->map[aux].x = i;
 			fdf->map[aux].y = j;
-			fdf->map[aux].z = ft_atoi(temp[i]);
+			fdf->map[aux].z = ft_atoi(temp[i]) * 0.2;
+			if (check_color(temp[i]))			
+				fdf->map[aux].color = get_color((ft_split(temp[i], ',')[1]));
+			else
+				fdf->map[aux].color = DEFAULT_COLOR;
 			i++;
 			aux++;
 		}
@@ -963,32 +1029,45 @@ void	scale_map(t_fdf *fdf)
 		i++;
 	}
 }
-
-void    process_map(t_fdf *fdf, char *map_addr)
+void	set_mouse_delayer(t_fdf *fdf)
 {
-	get_map_width(fdf, map_addr);
-	get_map_height(fdf, map_addr);
-	fdf->map_size = fdf->map_H * fdf->map_W;
 	if (20000 < fdf->map_size && fdf->map_size < 100000)
 		fdf->mouse_delayer = 5;
 	else if (100000 < fdf->map_size && fdf->map_size < 1000000)
 		fdf->mouse_delayer = 7;
 	else if (1000000 < fdf->map_size)
 		fdf->mouse_delayer = 13;
-	//printf("SIZE: %i || %i\n", fdf->map_size, fdf->mouse_delayer);
+}
+
+void	set_map_dim(t_fdf *fdf)
+{
+	fdf->map_size = fdf->map_H * fdf->map_W;
 	fdf->map_edges_W = fdf->map_W - 1;
 	fdf->map_edges_H = fdf->map_H - 1;
+	fdf->spacing_W = (WINW * fdf->zoom) / (fdf->map_edges_W);
+	fdf->spacing_H = (WINH * fdf->zoom) / (fdf->map_edges_H);
+
+}
+
+void    process_map(t_fdf *fdf, char *map_addr)
+{
+	get_map_width(fdf, map_addr);
+	get_map_height(fdf, map_addr);
+	set_map_dim(fdf);
+	set_mouse_delayer(fdf);
+	//printf("SIZE: %i || %i\n", fdf->map_size, fdf->mouse_delayer);
 	get_map_coords(fdf, map_addr);
 	set_position(fdf);
 	get_backup_map(fdf);
-	rotate_map(fdf, -50, 160, -180);
+	rotate_map(fdf, 45, 0, -15);
 	scale_map(fdf);
-	/*int i = 0;
+	/*
+	int i = 0;
 	printf("%i\n", i);
 	while (i < fdf->map_size)
 	{
-		printf("---------- X:%f -- Y:%f -- Z:%f |||| %i\n", fdf->map[i].x, fdf->map[i].y, fdf->map[i].z, i);
-		printf("BACKUP --- X:%f -- Y:%f -- Z:%f |||| %i\n", fdf->backup_map[i].x, fdf->backup_map[i].y, fdf->backup_map[i].z, i);
+		printf("---------- X:%f -- Y:%f -- Z:%f ||COLOR: %x|| %i\n", fdf->map[i].x, fdf->map[i].y, fdf->map[i].z, fdf->map[i].color, i);
+		printf("BACKUP --- X:%f -- Y:%f -- Z:%f ||COLOR: %x|| %i\n", fdf->backup_map[i].x, fdf->backup_map[i].y, fdf->backup_map[i].z, fdf->backup_map[i].color, i);
 		i++;
 	}*/
 }
@@ -1016,7 +1095,8 @@ void    calculate_bresenham(t_img *img, t_bresenham *bres)
 	res_y = bres->i_pt.y;
 	while (!(res_x == bres->f_pt.x) || !(res_y == bres->f_pt.y))
 	{
-		my_mlx_pixel_put(img, res_x, res_y, CYAN_GULF);
+		bres->color = fade_color_bres(bres);
+		my_mlx_pixel_put(img, res_x, res_y, bres->color);
 		bres->d2 = bres->d * 2;
 		if (bres->d2 >= bres->dy)
 		{
@@ -1029,7 +1109,8 @@ void    calculate_bresenham(t_img *img, t_bresenham *bres)
 			res_y += bres->i_two;
 		}
 	}
-	my_mlx_pixel_put(img, res_x, res_y, CYAN_GULF);
+	bres->color = fade_color_bres(bres);
+	my_mlx_pixel_put(img, res_x, res_y, bres->color);
 }
 
 void	init_bresenham_line(t_img *img, t_coords *i_pt, t_coords *f_pt)
@@ -1038,8 +1119,11 @@ void	init_bresenham_line(t_img *img, t_coords *i_pt, t_coords *f_pt)
 
 	bres.i_pt.x = (int)round(i_pt->x);
 	bres.i_pt.y = (int)round(i_pt->y);
+	bres.i_pt.color = i_pt->color;
 	bres.f_pt.x = (int)round(f_pt->x);
 	bres.f_pt.y = (int)round(f_pt->y);
+	bres.f_pt.color = f_pt->color;
+	set_fade_bres(&bres);
 	bres.i_one = -1;
 	bres.i_two = -1;
 	bres.dx = fabs(bres.f_pt.x - bres.i_pt.x);
