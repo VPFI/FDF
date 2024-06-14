@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/14 14:40:15 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/14 18:12:37 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,11 +85,16 @@
 # define COMMA_KEY 0x2c
 # define PERIOD_KEY 0x2e
 # define SLASH_KEY 0x2f
+# define SPACE_KEY 0x20
 
 
 //Get linux mask stuff here...
-# define KEY_PRESS_M (1L<<0)
-# define KEY_RELEASE_M (1L<<1)
+# define KEYPRESS_M (1L<<0)
+# define KEYRELEASE_M (1L<<1)
+# define MOUSEPRESS_M (1L<<2)
+# define MOUSERELEASE_M (1L<<3)
+# define MOUSEMOVE_M (1L<<6)
+# define STRUCTNOTIFY_M (1L<<17)
 
 # define KEYDOWN 2
 # define KEYUP 3
@@ -123,10 +128,17 @@ typedef struct s_fdf{
 	int         map_edges_W;
 	int         map_edges_H;
 	int         map_size;
-	float       spacing_W;
-	float       spacing_H;
 	int			tras[2];
 	int			rot_deg[3];
+	int			is_left_mouse_pres;
+	int			is_right_mouse_pres;
+	int			mouse_x;
+	int			mouse_y;
+	int			mouse_tracker;
+	int			animate;
+	float		z_factor;
+	float       spacing_W;
+	float       spacing_H;
 	float		zoom;
 	t_coords    *map;
 	t_coords    *backup_map;

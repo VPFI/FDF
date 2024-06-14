@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/14 14:38:15 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/14 18:19:04 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,14 @@ void    init_fdf(t_fdf *fdf)
 	fdf->rot_deg[Z] = 0;
 	fdf->tras[X] = 0;
 	fdf->tras[Y] = 0;
+	fdf->is_left_mouse_pres = 0;
+	fdf->is_right_mouse_pres = 0;
+	fdf->mouse_tracker = 0;
+	fdf->mouse_x = 0;
+	fdf->mouse_y = 0;
 	fdf->zoom = 0.7;
+	fdf->animate = 0;
+	fdf->z_factor = 1;
 }
 
 int trgb_color(int t, int r, int g, int b)
@@ -345,13 +352,15 @@ void    draw_map(t_fdf *fdf)
 void	reset_map(t_fdf *fdf)
 {
 	int	i;
-	
+
 	i = 0;
 	while (i < fdf->map_size)
 	{
-		fdf->map[i] = fdf->backup_map[i];
+		fdf->map[i].x = fdf->backup_map[i].x;
+		fdf->map[i].y = fdf->backup_map[i].y;
+		fdf->map[i].z = fdf->backup_map[i].z * fdf->z_factor;
 		i++;
-	}	
+	}
 }
 
 void	rotate_key(t_fdf *fdf, int angle_x, int angle_y, int angle_z)
@@ -367,6 +376,8 @@ void	move_key(t_fdf *fdf, int dist, int dir)
 	int	i;
 
 	i = 0;
+	if (!dist)
+		return ;
 	while (i < fdf->map_size)
 	{
 		if (dir)
@@ -379,7 +390,7 @@ void	move_key(t_fdf *fdf, int dist, int dir)
 		fdf->tras[Y] += dist;
 	else if (!dir)
 		fdf->tras[X] += dist;
-	printf("MOVE || X: %i -- Y: %i\n", fdf->tras[X], fdf->tras[Y]);
+	//printf("MOVE || X: %i -- Y: %i\n", fdf->tras[X], fdf->tras[Y]);
 	draw_map(fdf);
 }
 
@@ -387,7 +398,7 @@ void	set_angles(int *angle)
 {
 	angle[X] = 0;
 	angle[Y] = 0;
-	angle[Z] = 0;		
+	angle[Z] = 0;
 }
 
 void	swap_persp(t_fdf *fdf, int p)
@@ -440,11 +451,10 @@ void	extrude(t_fdf *fdf, float dist)
 	int	i;
 
 	i = 0;
-	while (i < fdf->map_size)
-	{
-		fdf->map[i].z *= dist;
-		i++;
-	}
+	fdf->z_factor *= dist; 
+	reset_map(fdf);
+	rotate_map(fdf, 0, 0, 0);
+	scale_map(fdf);
 	draw_map(fdf);
 }
 
@@ -459,7 +469,7 @@ void	zoom_map(t_fdf *fdf, float amount)
 	rotate_map(fdf, 0, 0, 0);
 	scale_map(fdf);
 	draw_map(fdf);
-	printf("ZOOM || Z: %f\n", fdf->zoom);
+	//printf("ZOOM || Z: %f\n", fdf->zoom);
 }
 
 void	reset_zoom(t_fdf *fdf)
@@ -469,6 +479,90 @@ void	reset_zoom(t_fdf *fdf)
 	rotate_map(fdf, 0, 0, 0);
 	scale_map(fdf);
 	draw_map(fdf);
+}
+
+int	mouse_press(int button, int x, int y, void *fdf_B)
+{
+	t_fdf *fdf;
+
+	fdf = fdf_B;
+	if (button == 1)
+	{
+		fdf->is_left_mouse_pres = 1;
+		fdf->mouse_x = x;
+		fdf->mouse_y = y;
+	}
+	else if (button == 3)
+	{
+		fdf->is_right_mouse_pres = 1;
+		fdf->mouse_x = x;
+		fdf->mouse_y = y;
+	}
+	else if (button == 4)
+		zoom_map(fdf, 1.1);
+	else if (button == 5)
+		zoom_map(fdf, 0.9);
+	//printf("PPPP%i --- %i --- %i\n", button, x, y);
+	return (0);
+}
+
+int	mouse_rel(int button, int x, int y, void *fdf_B)
+{
+	t_fdf *fdf;
+
+	fdf = fdf_B;
+	if (button == 1)
+	{
+		fdf->is_left_mouse_pres = 0;
+		fdf->mouse_x = x;
+		fdf->mouse_y = y;
+	}
+	else if (button == 3)
+	{
+		fdf->is_right_mouse_pres = 0;
+		fdf->mouse_x = x;
+		fdf->mouse_y = y;
+	}
+	//printf("RRRR%i --- %i--- %i\n", button, x, y);
+	return (0);
+}
+
+int	mouse_move(int x, int y, void *fdf_B)
+{
+	t_fdf	*fdf;
+	int		dist_x;
+	int		dist_y;
+
+	fdf = fdf_B;
+	fdf->mouse_tracker++;
+	if (!fdf->is_right_mouse_pres && !fdf->is_left_mouse_pres)
+		return (0);
+	if (fdf->mouse_tracker % 3)
+		return (0);
+	dist_x = (x - fdf->mouse_x);
+	dist_y = (y - fdf->mouse_y);
+	if (fdf->is_right_mouse_pres)
+	{
+		if (dist_x)
+			move_key(fdf, dist_x, 0);
+		if (dist_y)
+			move_key(fdf, dist_y, 1);
+	}
+	if (fdf->is_left_mouse_pres)
+		rotate_key(fdf, dist_x / 2, dist_y / 2, 0);
+	fdf->mouse_x = x;
+	fdf->mouse_y = y;
+	//fdf->mouse_tracker = 0;
+	//printf("MMMM%f --- %f\n", dist_x, dist_y);
+	return (0);
+}
+
+void	animate(t_fdf *fdf)
+{
+	if (!fdf->animate)
+		fdf->animate = 1;
+	else
+		fdf->animate = 0;
 }
 
 int key_hook(int keycode, void *fdf)
@@ -503,6 +597,8 @@ int key_hook(int keycode, void *fdf)
 		rotate_key(fdf, 0, 0, 5);
 	else if (keycode == E_KEY)
 		rotate_key(fdf, 0, 0, -5);
+	else if (keycode == SPACE_KEY)
+		animate(fdf);
 	else if (keycode == R_KEY)
 		reset_pos(fdf);
 	else if (keycode == O_KEY)
@@ -529,6 +625,15 @@ int key_hook(int keycode, void *fdf)
 		move_key(fdf, -20, 0);
 	else if (keycode == RIGHT_KEY)
 		move_key(fdf, 20, 0);
+	return (0);
+}
+
+int	loop_hook(t_fdf *fdf)
+{
+	if (fdf->animate)
+	{
+		rotate_key(fdf, 0, -1, 0);		
+	}
 	return (0);
 }
 
@@ -746,7 +851,7 @@ void	rotate_z(t_coords *pt, float angle)
 
 	if (!angle)
 		return ;
-	temp_x = pt->x; 
+	temp_x = pt->x;
 	temp_y = pt->y;
 	pt->x = (temp_x * cos(angle)) + (temp_y * (-sin(angle)));
 	pt->y = (temp_x * sin(angle)) + (temp_y * cos(angle));
@@ -760,10 +865,10 @@ void	rotate_map(t_fdf *fdf, int deg_x, int deg_y, int deg_z)
 	float	angle_z;
 
 	i = 0;
-	fdf->rot_deg[X] = (fdf->rot_deg[X] + deg_x) % 360; 
+	fdf->rot_deg[X] = (fdf->rot_deg[X] + deg_x) % 360;
 	fdf->rot_deg[Y] = (fdf->rot_deg[Y] + deg_y) % 360;
 	fdf->rot_deg[Z] = (fdf->rot_deg[Z] + deg_z) % 360;
-	printf("ROTATE || x: %i -- y: %i -- z: %i\n", fdf->rot_deg[X], fdf->rot_deg[Y], fdf->rot_deg[Z]);
+	//printf("ROTATE || x: %i -- y: %i -- z: %i\n", fdf->rot_deg[X], fdf->rot_deg[Y], fdf->rot_deg[Z]);
 	angle_x = fdf->rot_deg[X] * PI / 180;
 	angle_y = fdf->rot_deg[Y] * PI / 180;
 	angle_z = fdf->rot_deg[Z] * PI / 180;
@@ -905,19 +1010,17 @@ void	init_bresenham_line(t_img *img, t_coords *i_pt, t_coords *f_pt)
 int main(int argc, char **argv)
 {
 	t_fdf   fdf;
-	//t_img img;
-	//int   img_width;
-	//int   img_height;
 
 	argc++;
 	if (argv[0])
 		init_fdf(&fdf);
 	process_map(&fdf, argv[1]);
 	draw_welcome_menu(&fdf);
-	//img.img_ptr = mlx_xpm_file_to_image(fdf.mlx_ptr, "./test2.xpm", &img_width, &img_height);
-	//mlx_put_image_to_window(fdf.mlx_ptr, fdf.win_ptr, img.img_ptr, 0, 0);
-	//mlx_mouse_hook();
-	mlx_hook(fdf.win_ptr, KEYDOWN, KEY_PRESS_M, key_hook, (void *)&fdf);
-	mlx_hook(fdf.win_ptr, DESTROY, 0, close_all, &fdf);
+	mlx_hook(fdf.win_ptr, KEYDOWN, KEYPRESS_M, key_hook, (void *)&fdf);
+	mlx_hook(fdf.win_ptr, DESTROY, STRUCTNOTIFY_M, close_all, &fdf);
+	mlx_hook(fdf.win_ptr, MOUSEDOWN, MOUSEPRESS_M, mouse_press, (void *)&fdf);
+	mlx_hook(fdf.win_ptr, MOUSEUP, MOUSERELEASE_M, mouse_rel, (void *)&fdf);
+	mlx_hook(fdf.win_ptr, MOUSEMOVE, MOUSEMOVE_M, mouse_move, (void *)&fdf);
+	mlx_loop_hook(fdf.mlx_ptr, loop_hook, &fdf);
 	mlx_loop(fdf.mlx_ptr);
 }
