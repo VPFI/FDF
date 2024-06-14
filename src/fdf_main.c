@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/14 18:19:04 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/14 18:29:13 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -481,6 +481,24 @@ void	reset_zoom(t_fdf *fdf)
 	draw_map(fdf);
 }
 
+void	reset_all(t_fdf *fdf)
+{
+	int	i;
+
+	i = 0;
+	fdf->z_factor = 1;
+	while (i < fdf->map_size)
+	{
+		fdf->map[i].x -= fdf->tras[X];
+		fdf->map[i].y -= fdf->tras[Y];
+		i++;
+	}
+	fdf->tras[X] = 0;
+	fdf->tras[Y] = 0;
+	fdf->zoom = 0.7;
+	swap_persp(fdf, 3);
+}
+
 int	mouse_press(int button, int x, int y, void *fdf_B)
 {
 	t_fdf *fdf;
@@ -492,6 +510,8 @@ int	mouse_press(int button, int x, int y, void *fdf_B)
 		fdf->mouse_x = x;
 		fdf->mouse_y = y;
 	}
+	else if (button == 2)
+		reset_all(fdf);
 	else if (button == 3)
 	{
 		fdf->is_right_mouse_pres = 1;
@@ -929,7 +949,7 @@ void    process_map(t_fdf *fdf, char *map_addr)
 	get_map_width(fdf, map_addr);
 	get_map_height(fdf, map_addr);
 	fdf->map_size = fdf->map_H * fdf->map_W;
-	printf("SIZE: %i\n", fdf->map_size);
+	//printf("SIZE: %i\n", fdf->map_size);
 	fdf->map_edges_W = fdf->map_W - 1;
 	fdf->map_edges_H = fdf->map_H - 1;
 	get_map_coords(fdf, map_addr);
