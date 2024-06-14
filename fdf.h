@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/14 18:12:37 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/14 19:06:14 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,7 @@
 # define PERIOD_KEY 0x2e
 # define SLASH_KEY 0x2f
 # define SPACE_KEY 0x20
+# define SHIFT_KEY 0xffe1
 
 
 //Get linux mask stuff here...
@@ -135,6 +136,8 @@ typedef struct s_fdf{
 	int			mouse_x;
 	int			mouse_y;
 	int			mouse_tracker;
+	int			mouse_delayer;
+	int			shift_tracker;
 	int			animate;
 	float		z_factor;
 	float       spacing_W;

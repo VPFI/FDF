@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/14 18:29:13 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/14 19:17:21 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,11 +59,13 @@ void    init_fdf(t_fdf *fdf)
 	fdf->is_left_mouse_pres = 0;
 	fdf->is_right_mouse_pres = 0;
 	fdf->mouse_tracker = 0;
+	fdf->mouse_delayer = 3;
 	fdf->mouse_x = 0;
 	fdf->mouse_y = 0;
 	fdf->zoom = 0.7;
 	fdf->animate = 0;
 	fdf->z_factor = 1;
+	fdf->shift_tracker = 0;
 }
 
 int trgb_color(int t, int r, int g, int b)
@@ -554,10 +556,9 @@ int	mouse_move(int x, int y, void *fdf_B)
 	int		dist_y;
 
 	fdf = fdf_B;
-	fdf->mouse_tracker++;
 	if (!fdf->is_right_mouse_pres && !fdf->is_left_mouse_pres)
 		return (0);
-	if (fdf->mouse_tracker % 3)
+	if (fdf->mouse_tracker++ % fdf->mouse_delayer)
 		return (0);
 	dist_x = (x - fdf->mouse_x);
 	dist_y = (y - fdf->mouse_y);
@@ -568,7 +569,9 @@ int	mouse_move(int x, int y, void *fdf_B)
 		if (dist_y)
 			move_key(fdf, dist_y, 1);
 	}
-	if (fdf->is_left_mouse_pres)
+	if (fdf->is_left_mouse_pres && fdf->shift_tracker)
+		rotate_key(fdf, 0, 0, dist_x / 4 + dist_y / 4);
+	else if (fdf->is_left_mouse_pres)
 		rotate_key(fdf, dist_x / 2, dist_y / 2, 0);
 	fdf->mouse_x = x;
 	fdf->mouse_y = y;
@@ -583,6 +586,14 @@ void	animate(t_fdf *fdf)
 		fdf->animate = 1;
 	else
 		fdf->animate = 0;
+}
+
+void	shift_tracker(t_fdf *fdf)
+{
+	if (!fdf->shift_tracker)
+		fdf->shift_tracker = 1;
+	else
+		fdf->shift_tracker = 0;
 }
 
 int key_hook(int keycode, void *fdf)
@@ -619,6 +630,8 @@ int key_hook(int keycode, void *fdf)
 		rotate_key(fdf, 0, 0, -5);
 	else if (keycode == SPACE_KEY)
 		animate(fdf);
+	else if (keycode == SHIFT_KEY)
+		shift_tracker(fdf);
 	else if (keycode == R_KEY)
 		reset_pos(fdf);
 	else if (keycode == O_KEY)
@@ -645,6 +658,13 @@ int key_hook(int keycode, void *fdf)
 		move_key(fdf, -20, 0);
 	else if (keycode == RIGHT_KEY)
 		move_key(fdf, 20, 0);
+	return (0);
+}
+
+int	key_hook_release(int keycode, void *fdf)
+{
+	if (keycode == SHIFT_KEY)
+		shift_tracker(fdf);	
 	return (0);
 }
 
@@ -949,16 +969,21 @@ void    process_map(t_fdf *fdf, char *map_addr)
 	get_map_width(fdf, map_addr);
 	get_map_height(fdf, map_addr);
 	fdf->map_size = fdf->map_H * fdf->map_W;
-	//printf("SIZE: %i\n", fdf->map_size);
+	if (20000 < fdf->map_size && fdf->map_size < 100000)
+		fdf->mouse_delayer = 5;
+	else if (100000 < fdf->map_size && fdf->map_size < 1000000)
+		fdf->mouse_delayer = 7;
+	else if (1000000 < fdf->map_size)
+		fdf->mouse_delayer = 13;
+	//printf("SIZE: %i || %i\n", fdf->map_size, fdf->mouse_delayer);
 	fdf->map_edges_W = fdf->map_W - 1;
 	fdf->map_edges_H = fdf->map_H - 1;
 	get_map_coords(fdf, map_addr);
 	set_position(fdf);
 	get_backup_map(fdf);
-	rotate_map(fdf, 45, 0, 45);
+	rotate_map(fdf, -50, 160, -180);
 	scale_map(fdf);
-	/*
-	int i = 0;
+	/*int i = 0;
 	printf("%i\n", i);
 	while (i < fdf->map_size)
 	{
@@ -1037,6 +1062,7 @@ int main(int argc, char **argv)
 	process_map(&fdf, argv[1]);
 	draw_welcome_menu(&fdf);
 	mlx_hook(fdf.win_ptr, KEYDOWN, KEYPRESS_M, key_hook, (void *)&fdf);
+	mlx_hook(fdf.win_ptr, KEYUP, KEYRELEASE_M, key_hook_release, (void *)&fdf);
 	mlx_hook(fdf.win_ptr, DESTROY, STRUCTNOTIFY_M, close_all, &fdf);
 	mlx_hook(fdf.win_ptr, MOUSEDOWN, MOUSEPRESS_M, mouse_press, (void *)&fdf);
 	mlx_hook(fdf.win_ptr, MOUSEUP, MOUSERELEASE_M, mouse_rel, (void *)&fdf);
