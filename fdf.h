@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/13 21:57:06 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/14 14:40:15 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include   "minilibx_linux/mlx.h"
 # include   "libft/libft.h"
+# include	"printf/ft_printf.h"
 # include   <math.h>
 # include   <float.h>
 # include   <stdio.h>
@@ -87,6 +88,8 @@
 
 
 //Get linux mask stuff here...
+# define KEY_PRESS_M (1L<<0)
+# define KEY_RELEASE_M (1L<<1)
 
 # define KEYDOWN 2
 # define KEYUP 3
