@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/13 22:08:17 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/14 13:18:16 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -456,6 +456,7 @@ void	zoom_map(t_fdf *fdf, float amount)
 		rotate_map(fdf, 0, 0, 0);
 		scale_map(fdf);
 		draw_map(fdf);
+		printf("ZOOM || Z: %f\n", fdf->zoom);
 	}
 }
 
@@ -899,6 +900,6 @@ int main(int argc, char **argv)
 	draw_welcome_menu(&fdf);
 	//img.img_ptr = mlx_xpm_file_to_image(fdf.mlx_ptr, "./test2.xpm", &img_width, &img_height);
 	//mlx_put_image_to_window(fdf.mlx_ptr, fdf.win_ptr, img.img_ptr, 0, 0);
-	mlx_hook(fdf.win_ptr, KEYUP, (1L<<1), key_hook, (void *)&fdf);
+	mlx_hook(fdf.win_ptr, KEYDOWN, (1L<<1), key_hook, (void *)&fdf);
 	mlx_loop(fdf.mlx_ptr);
 }
