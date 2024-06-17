@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/17 16:28:28 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/17 18:41:26 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,9 @@
 # define CENTER_X WINW / 2
 # define CENTER_Y WINH / 2
 
-# define DEFAULT_COLOR 0xFF6720
-# define DEFAULT_COLOR_MAX 0xC9DFEC
-# define DEFAULT_COLOR_MIN 0xFF6720
+# define DEF_COLOR 0x1A1A1A
+# define DEF_COLOR_MAX 0xC9DFEC
+# define DEF_COLOR_MIN 0xFF6720
 # define WHITE 0xFFFFFF
 # define BLACK 0x0
 # define GRAY_DARK 0x1A1A1A
@@ -141,6 +141,8 @@ typedef struct s_fdf{
 	int			shift_tracker;
 	int			animate;
 	int			color_flag;
+	int			z_max;
+	int			z_min;
 	int			z_diff;
 	float		z_factor;
 	float       spacing_W;
