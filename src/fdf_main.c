@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/17 18:41:25 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/17 21:46:57 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,9 @@ void    init_fdf(t_fdf *fdf)
 	fdf->z_diff = 0;
 	fdf->z_factor = 1;
 	fdf->shift_tracker = 0;
+	fdf->load_flag = 0;
+	fdf->entered = 0;
+	fdf->test = 0;
 }
 
 int trgb_color(int t, int r, int g, int b)
@@ -186,7 +189,39 @@ int fade_color_bres(t_bresenham *bres)
 	return (trgb_color(t, r, g, b));
 }
 
-void    draw_circle_inward(float center_x, float center_y, int radius, int inner_radius, float smothness, int color1, int color2, float fade, t_img *img)
+void    draw_circle_loading(float center_x, float center_y, int radius, int inner_radius, float smothness, int color1, int color2, float fade, t_img *img, float perc)
+{
+	t_circle circle;
+
+	circle.x = 0;
+	circle.y = 0;
+	circle.center_x = center_x;
+	circle.center_y = center_y;
+	circle.radius = radius;
+	circle.degree = 0;
+	circle.smothness = smothness;
+	circle.increment = PI / circle.smothness;
+	circle.og_color = color1;
+	fade = circle.radius * fade;
+	set_fade_circle(&circle, circle.og_color, color2, (int)fade);
+	while (inner_radius <= circle.radius)
+	{
+		circle.degree = H_PI;
+		circle.x = 0;
+		circle.y = 0;
+		circle.color = fade_color_circle(&circle);
+		while (fabs(H_PI - circle.degree) <= D_PI * perc)
+		{
+			circle.x = circle.center_x + ((float)(circle.radius) * cos(circle.degree));
+			circle.y = circle.center_y + ((float)(circle.radius) * sin(-circle.degree));
+			my_mlx_pixel_put(img, circle.x, circle.y, circle.color);
+			//circle.color = fade_color_circle(&circle);
+			circle.degree -= circle.increment;
+		}
+		circle.radius--;
+	}
+}
+void    draw_circle_inward(float center_x, float center_y, int radius, int inner_radius, float smothness, int color1, int color2, float fade, t_img *img, int mode)
 {
 	t_circle circle;
 
@@ -211,10 +246,14 @@ void    draw_circle_inward(float center_x, float center_y, int radius, int inner
 		{
 			circle.x = circle.center_x + ((float)(circle.radius) * cos(circle.degree));
 			circle.y = circle.center_y + ((float)(circle.radius) * sin(circle.degree));
-			my_mlx_pixel_put(img, circle.x, circle.y, circle.color);
-			my_mlx_pixel_put(img, (center_x - (circle.x - center_x)), circle.y, circle.color);
-			my_mlx_pixel_put(img, (center_x - (circle.x - center_x)), (center_y - (circle.y - center_y)), circle.color);
-			my_mlx_pixel_put(img, circle.x, (center_y - (circle.y - center_y)), circle.color);
+			if (mode > 0)
+				my_mlx_pixel_put(img, circle.x, (center_y - (circle.y - center_y)), circle.color);
+			if (mode > 1)
+				my_mlx_pixel_put(img, circle.x, circle.y, circle.color);
+			if (mode > 2)
+				my_mlx_pixel_put(img, (center_x - (circle.x - center_x)), circle.y, circle.color);
+			if (mode > 3)
+				my_mlx_pixel_put(img, (center_x - (circle.x - center_x)), (center_y - (circle.y - center_y)), circle.color);
 			//circle.color = fade_color_circle(&circle);
 			circle.degree += circle.increment;
 		}
@@ -285,7 +324,7 @@ void    draw_scene_two(t_fdf *fdf)
 	if (fdf->b_ground.img_ptr)
 		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
-	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 6000, BLACK, CYAN_GULF, 0.85, &fdf->b_ground);
+	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 6000, BLACK, CYAN_GULF, 0.85, &fdf->b_ground, 4);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
 
@@ -295,7 +334,7 @@ void    draw_scene_three(t_fdf *fdf)
 		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
 	draw_circle_outward(CENTER_X, CENTER_Y, 500, 1300, 6000, BLACK, ORANGE_GULF, 0.85, &fdf->b_ground);
-	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 6000, BLACK, CYAN_GULF, 0.85, &fdf->b_ground);
+	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 6000, BLACK, CYAN_GULF, 0.85, &fdf->b_ground, 4);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
 
@@ -304,8 +343,8 @@ void    draw_scene_four(t_fdf *fdf)
 	if (fdf->b_ground.img_ptr)
 		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
-	draw_circle_inward(CENTER_X, CENTER_Y, 1500, 0, 1000, WHITE, BLACK, 0.7, &fdf->b_ground);
-	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 350, BLACK, CYAN_GULF, 0.85, &fdf->b_ground);
+	draw_circle_inward(CENTER_X, CENTER_Y, 1500, 0, 1000, WHITE, BLACK, 0.7, &fdf->b_ground, 4);
+	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 350, BLACK, CYAN_GULF, 0.85, &fdf->b_ground, 4);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
 
@@ -315,33 +354,15 @@ void    draw_scene_five(t_fdf *fdf)
 		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
 	draw_circle_outward(CENTER_X, CENTER_Y, 510, 1300, 900, ORANGE_GULF, ORANGE_GULF, 1, &fdf->b_ground);
-	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 400, CYAN_GULF, CYAN_GULF, 1, &fdf->b_ground);
+	draw_circle_inward(CENTER_X, CENTER_Y, 490, 0, 400, CYAN_GULF, CYAN_GULF, 1, &fdf->b_ground, 4);
 	draw_circle_outward(CENTER_X, CENTER_Y, 500, 510, 4000, BLACK, ORANGE_GULF, 0.03, &fdf->b_ground);
-	draw_circle_inward(CENTER_X, CENTER_Y, 500, 490, 4000, BLACK, CYAN_GULF, 0.03, &fdf->b_ground);
+	draw_circle_inward(CENTER_X, CENTER_Y, 500, 490, 4000, BLACK, CYAN_GULF, 0.03, &fdf->b_ground, 4);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
 
 void    draw_scene_six(t_fdf *fdf)
 {
-	t_coords i_pt;
-	t_coords f_pt;
-
-	int 	radius = 200;
-	float	degree = 0;
-	float 	increment = PI / 10;
-	i_pt.x = CENTER_X;
-	i_pt.y = CENTER_Y;
-	if (fdf->b_ground.img_ptr)
-		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
-	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
-	while (degree <= D_PI)
-	{
-		f_pt.x = CENTER_X + ((float)(radius) * cos(degree));
-		f_pt.y = CENTER_Y + ((float)(radius) * sin(degree));
-		init_bresenham_line(&fdf->b_ground, &i_pt, &f_pt);
-		degree += increment;
-	}
-	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
+	fdf->load_flag = 1;
 }
 
 void    draw_map(t_fdf *fdf)
@@ -448,6 +469,7 @@ void	swap_persp(t_fdf *fdf, int p)
 {
 	int	angle[3];
 
+	fdf->entered = 1;
 	set_angles(angle);
 	if (p == 1)
 	{
@@ -637,10 +659,32 @@ void	shift_tracker(t_fdf *fdf)
 		fdf->shift_tracker = 0;
 }
 
+int	check_load(t_fdf *fdf)
+{
+	if (fdf->load_flag == 1)
+		return (1);
+	else
+		return (0);
+}
+
+int	check_enter(t_fdf *fdf)
+{
+	if (fdf->entered == 1)
+		return (1);
+	else
+		return (0);
+}
+
 int key_hook(int keycode, void *fdf)
 {
 	if (keycode == ESC_KEY)
 		close_all(fdf);
+	else if (!check_load(fdf))
+		return (0);
+	else if (keycode == ENTER_KEY)
+		swap_persp(fdf, 3);
+	else if (!check_enter(fdf))
+		return (0);
 	else if (keycode == ONE_KEY)
 		draw_scene_one(fdf);
 	else if (keycode == TWO_KEY)
@@ -653,8 +697,6 @@ int key_hook(int keycode, void *fdf)
 		draw_scene_five(fdf);
 	else if (keycode == SIX_KEY)
 		draw_scene_six(fdf);
-	else if (keycode == SEVEN_KEY)
-		swap_persp(fdf, 3);
 	else if (keycode == M_KEY)
 		draw_welcome_menu(fdf);
 	else if (keycode == W_KEY)
@@ -705,15 +747,38 @@ int key_hook(int keycode, void *fdf)
 int	key_hook_release(int keycode, void *fdf)
 {
 	if (keycode == SHIFT_KEY)
-		shift_tracker(fdf);	
+		shift_tracker(fdf);
+	
 	return (0);
 }
 
 int	loop_hook(t_fdf *fdf)
 {
+	int		color;
+	float	fade[3];
+	int		r;
+	int		g;
+	int		b;
+
 	if (fdf->animate)
 	{
-		rotate_key(fdf, 0, -1, 0);		
+		rotate_key(fdf, 0, -1, 0);
+		return (0);
+	}
+	if (fdf->load_flag && !fdf->entered)
+	{
+		color = 0;
+		fdf->test = fdf->test % 360;
+		fade[0] = (float)((r_color(DEF_COLOR_MAX)) - (r_color(BLACK))) / 360;
+		fade[1] = (float)((g_color(DEF_COLOR_MAX)) - (g_color(BLACK))) / 360;
+		fade[2] = (float)((b_color(DEF_COLOR_MAX)) - (b_color(BLACK))) / 360;
+		r = r_color(BLACK) + (fade[0] * fdf->test);
+		g = g_color(BLACK) + (fade[1] * fdf->test);
+		b = b_color(BLACK) + (fade[2] * fdf->test);
+		color = trgb_color(0, r, g, b);
+		draw_circle_inward(CENTER_X, CENTER_Y, 400, 0, 3000, color, BLACK, 0.8, &fdf->b_ground, 4);
+		mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
+		fdf->test++;
 	}
 	return (0);
 }
@@ -740,8 +805,7 @@ void    draw_sides(t_fdf *fdf, float extent, float y_start, float y_finish, int 
 	while (pt.x < extent)
 	{
 		pt.y = y_base;
-		//set_fade(&pt, pt.og_color, BLACK, WINH * 0.25);
-		//while (pt.y < WINH * 0.25)
+		//set_fade(&pt, pt.og_color, BLACK, WINH * 0.25);while (pt.y < WINH * 0.25)
 		while (pt.y < y_finish)
 		{
 			my_mlx_pixel_put(&fdf->b_ground, pt.x, pt.y, pt.color);
@@ -751,6 +815,18 @@ void    draw_sides(t_fdf *fdf, float extent, float y_start, float y_finish, int 
 		pt.color = fade_color(&pt);
 		pt.x++;
 	}
+}
+
+void    draw_loading_screen(t_fdf *fdf, float perc)
+{
+	if (fdf->b_ground.img_ptr)
+		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
+	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
+	draw_circle_outward(CENTER_X, CENTER_Y, 400, 410, 3000, CYAN_GULF, BLACK, 0.03, &fdf->b_ground);
+	draw_circle_loading(CENTER_X, CENTER_Y, 400, 0, 3000, CYAN_GULF, BLACK, 0.7, &fdf->b_ground, perc);
+	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
+	if (perc == 1)
+		fdf->load_flag = 1;
 }
 
 void    draw_welcome_menu(t_fdf *fdf)
@@ -968,6 +1044,7 @@ void    get_map_coords(t_fdf *fdf, char *map_addr)
 			{	
 				fdf->color_flag = 1;	
 				fdf->map[aux].color = get_color((ft_split(temp[i], ',')[1]));
+				//free this split
 			}
 			else
 				fdf->map[aux].color = DEF_COLOR;
@@ -1125,14 +1202,21 @@ void	set_map_dim(t_fdf *fdf, char *map_addr)
 void    process_map(t_fdf *fdf, char *map_addr)
 {
 	set_map_dim(fdf, map_addr);
+	draw_loading_screen(fdf, 0.22);
 	set_mouse_delayer(fdf);
+	draw_loading_screen(fdf, 0.34);
 	set_z_scaling(fdf);
+	draw_loading_screen(fdf, 0.46);
 	get_map_coords(fdf, map_addr);
+	draw_loading_screen(fdf, 0.68);
 	get_z_diff(fdf);
 	if (!fdf->color_flag)
 		load_color_map(fdf);
+	draw_loading_screen(fdf, 0.8);
 	set_position(fdf);
+	draw_loading_screen(fdf, 0.92);
 	get_backup_map(fdf);
+	draw_loading_screen(fdf, 1);
 	/*
 	int i = 0;
 	printf("%i\n", i);
@@ -1212,11 +1296,13 @@ int main(int argc, char **argv)
 {
 	t_fdf   fdf;
 
-	argc++;
-	if (argv[0])
+	if (argc != 2 || !ft_strnstr(argv[1], ".fdf", ft_strlen(argv[1])))
+		file_err(argv[1]);
+	else
 		init_fdf(&fdf);
+	draw_loading_screen(&fdf, 0.1);
 	process_map(&fdf, argv[1]);
-	draw_welcome_menu(&fdf);
+	//draw_welcome_menu(&fdf);
 	mlx_hook(fdf.win_ptr, KEYDOWN, KEYPRESS_M, key_hook, (void *)&fdf);
 	mlx_hook(fdf.win_ptr, KEYUP, KEYRELEASE_M, key_hook_release, (void *)&fdf);
 	mlx_hook(fdf.win_ptr, DESTROY, STRUCTNOTIFY_M, close_all, &fdf);

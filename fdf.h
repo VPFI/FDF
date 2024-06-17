@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/17 18:41:26 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/17 21:28:51 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@
 # define FIVE_KEY 0x35
 # define SIX_KEY 0x36
 # define SEVEN_KEY 0x37
+# define ENTER_KEY 0xff0d
 # define LEFT_KEY 0xff51
 # define UP_KEY 0xff52
 # define RIGHT_KEY 0xff53
@@ -144,10 +145,13 @@ typedef struct s_fdf{
 	int			z_max;
 	int			z_min;
 	int			z_diff;
+	int			load_flag;
+	int			entered;
 	float		z_factor;
 	float       spacing_W;
 	float       spacing_H;
 	float		zoom;
+	int			test;
 	t_coords    *map;
 	t_coords    *backup_map;
 }               t_fdf;
