@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/14 20:09:35 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/17 16:28:28 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 # define Z  2
 # define C  3
 # define WINW   2000
-# define WINH   1500
+# define WINH   1300
 # define D_PI   6.2831
 # define PI     3.1416
 # define H_PI   1.5708
@@ -34,6 +34,8 @@
 # define CENTER_Y WINH / 2
 
 # define DEFAULT_COLOR 0xFF6720
+# define DEFAULT_COLOR_MAX 0xC9DFEC
+# define DEFAULT_COLOR_MIN 0xFF6720
 # define WHITE 0xFFFFFF
 # define BLACK 0x0
 # define GRAY_DARK 0x1A1A1A
@@ -138,6 +140,8 @@ typedef struct s_fdf{
 	int			mouse_delayer;
 	int			shift_tracker;
 	int			animate;
+	int			color_flag;
+	int			z_diff;
 	float		z_factor;
 	float       spacing_W;
 	float       spacing_H;
@@ -196,5 +200,6 @@ void	rotate_y(t_coords *pt, float angle);
 void	rotate_z(t_coords *pt, float angle);
 void	rotate_map(t_fdf *fdf, int deg_x, int deg_y, int deg_z);
 void	scale_map(t_fdf *fdf);
+void	set_z_scaling(t_fdf *fdf);
 
 #endif
