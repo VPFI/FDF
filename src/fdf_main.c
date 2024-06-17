@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/14 21:58:23 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/17 16:28:03 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,8 @@ void    init_fdf(t_fdf *fdf)
 	fdf->mouse_y = 0;
 	fdf->zoom = 0.7;
 	fdf->animate = 0;
+	fdf->color_flag = 0;
+	fdf->z_diff = 0;
 	fdf->z_factor = 1;
 	fdf->shift_tracker = 0;
 }
@@ -161,9 +163,9 @@ void    set_fade_bres(t_bresenham *bres)
 	dist_x = bres->f_pt.x - bres->i_pt.x;
 	dist_y = bres->f_pt.y - bres->i_pt.y;
 	bres->max = modulo(dist_x, dist_y);
-	bres->fade_comp[1] = (float)((r_color(bres->i_pt.color)) - (r_color(bres->f_pt.color)))/bres->max;
-	bres->fade_comp[2] = (float)((g_color(bres->i_pt.color)) - (g_color(bres->f_pt.color)))/bres->max;
-	bres->fade_comp[3] = (float)((b_color(bres->i_pt.color)) - (b_color(bres->f_pt.color)))/bres->max;
+	bres->fade_comp[1] = (float)((r_color(bres->f_pt.color)) - (r_color(bres->i_pt.color))) / bres->max;
+	bres->fade_comp[2] = (float)((g_color(bres->f_pt.color)) - (g_color(bres->i_pt.color))) / bres->max;
+	bres->fade_comp[3] = (float)((b_color(bres->f_pt.color)) - (b_color(bres->i_pt.color))) / bres->max;
 	bres->n = 1;
 }
 
@@ -492,7 +494,7 @@ void	extrude(t_fdf *fdf, float dist)
 	int	i;
 
 	i = 0;
-	fdf->z_factor *= dist; 
+	fdf->z_factor *= dist;
 	reset_map(fdf);
 	rotate_map(fdf, 0, 0, 0);
 	scale_map(fdf);
@@ -527,7 +529,7 @@ void	reset_all(t_fdf *fdf)
 	int		i;
 
 	i = 0;
-	fdf->z_factor = 1;
+	set_z_scaling(fdf);
 	while (i < fdf->map_size)
 	{
 		fdf->map[i].x -= fdf->tras[X];
@@ -652,7 +654,7 @@ int key_hook(int keycode, void *fdf)
 	else if (keycode == SIX_KEY)
 		draw_scene_six(fdf);
 	else if (keycode == SEVEN_KEY)
-		draw_map(fdf);
+		swap_persp(fdf, 3);
 	else if (keycode == M_KEY)
 		draw_welcome_menu(fdf);
 	else if (keycode == W_KEY)
@@ -872,6 +874,52 @@ int	get_color(char *hexa_num)
 	return (parsed_num);
 }
 
+void	get_z_diff(t_fdf *fdf)
+{
+	int	i;
+	int	z_min;
+	int	z_max;
+
+	i = 0;
+	z_min = 0;
+	z_max = 0;
+	while (i < fdf->map_size)
+	{
+		if (fdf->map[i].z < z_min)		
+			z_min = fdf->map[i].z;
+		if (fdf->map[i].z > z_max)		
+			z_max = fdf->map[i].z;
+		i++;
+	}
+	fdf->z_diff = z_max - z_min;
+}
+
+void	load_color_map(t_fdf *fdf)
+{
+	int		i;
+	int		n;
+	int		c[4];
+	float	fade_comp[3];
+	
+	i = 0;
+	n = 0;
+	fade_comp[0] = (float)((r_color(DEFAULT_COLOR_MAX)) - (r_color(DEFAULT_COLOR_MIN))) / fdf->z_diff;
+	fade_comp[1] = (float)((g_color(DEFAULT_COLOR_MAX)) - (g_color(DEFAULT_COLOR_MIN))) / fdf->z_diff;
+	fade_comp[2] = (float)((b_color(DEFAULT_COLOR_MAX)) - (b_color(DEFAULT_COLOR_MIN))) / fdf->z_diff;
+	printf("diff %i\n", fdf->z_diff);
+	while (i < fdf->map_size)
+	{
+		n = fdf->z_diff - (fdf->z_diff - fabs(fdf->map[i].z));
+		c[0] = t_color(DEFAULT_COLOR_MIN);
+		c[1] = r_color(DEFAULT_COLOR_MIN) + (fade_comp[0] * n);
+		c[2] = g_color(DEFAULT_COLOR_MIN) + (fade_comp[1] * n);
+		c[3] = b_color(DEFAULT_COLOR_MIN) + (fade_comp[2] * n);
+		fdf->map[i].color = trgb_color(c[0], c[1], c[2], c[3]);
+		i++;
+	}
+
+}
+
 void    get_map_coords(t_fdf *fdf, char *map_addr)
 {
 	char    **temp;
@@ -905,9 +953,12 @@ void    get_map_coords(t_fdf *fdf, char *map_addr)
 		{
 			fdf->map[aux].x = i;
 			fdf->map[aux].y = j;
-			fdf->map[aux].z = ft_atoi(temp[i]) * 0.2;
-			if (check_color(temp[i]))			
+			fdf->map[aux].z = ft_atoi(temp[i]);
+			if (check_color(temp[i]))
+			{	
+				fdf->color_flag = 1;	
 				fdf->map[aux].color = get_color((ft_split(temp[i], ',')[1]));
+			}
 			else
 				fdf->map[aux].color = DEFAULT_COLOR;
 			i++;
@@ -1006,8 +1057,8 @@ void	set_position(t_fdf *fdf)
 		while (i < fdf->map_W)
 		{
 			fdf->map[index].x = aux_W + i;
-			//printf("aux :%i -- i: %i || POINT: %f\n",aux_W, i, fdf->map[i].x);
 			fdf->map[index].y = aux_H + j;
+			fdf->map[index].z *= 0.2;
 			i++;
 			index++;
 		}
@@ -1039,8 +1090,20 @@ void	set_mouse_delayer(t_fdf *fdf)
 		fdf->mouse_delayer = 13;
 }
 
-void	set_map_dim(t_fdf *fdf)
+void	set_z_scaling(t_fdf *fdf)
 {
+	if (0 < fdf->map_size && fdf->map_size < 500)
+		fdf->z_factor = fdf->zoom;
+	else if (500 < fdf->map_size && fdf->map_size < 20000)
+		fdf->z_factor = 2 * fdf->zoom;
+	else if (20000 < fdf->map_size)
+		fdf->z_factor = 4 * fdf->zoom;
+}
+
+void	set_map_dim(t_fdf *fdf, char *map_addr)
+{
+	get_map_width(fdf, map_addr);
+	get_map_height(fdf, map_addr);
 	fdf->map_size = fdf->map_H * fdf->map_W;
 	fdf->map_edges_W = fdf->map_W - 1;
 	fdf->map_edges_H = fdf->map_H - 1;
@@ -1051,16 +1114,15 @@ void	set_map_dim(t_fdf *fdf)
 
 void    process_map(t_fdf *fdf, char *map_addr)
 {
-	get_map_width(fdf, map_addr);
-	get_map_height(fdf, map_addr);
-	set_map_dim(fdf);
+	set_map_dim(fdf, map_addr);
 	set_mouse_delayer(fdf);
-	//printf("SIZE: %i || %i\n", fdf->map_size, fdf->mouse_delayer);
+	set_z_scaling(fdf);
 	get_map_coords(fdf, map_addr);
+	get_z_diff(fdf);
+	if (!fdf->color_flag)
+		load_color_map(fdf);
 	set_position(fdf);
 	get_backup_map(fdf);
-	rotate_map(fdf, 45, 0, -15);
-	scale_map(fdf);
 	/*
 	int i = 0;
 	printf("%i\n", i);
