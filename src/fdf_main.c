@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/17 16:28:03 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/17 18:41:25 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -891,33 +891,43 @@ void	get_z_diff(t_fdf *fdf)
 			z_max = fdf->map[i].z;
 		i++;
 	}
+	fdf->z_min = z_min;
+	fdf->z_max = z_max;
 	fdf->z_diff = z_max - z_min;
 }
-
+void	set_fade_map(float *fade, int color1, int color2, int dist)
+{
+	fade[0] = (float)((r_color(color1)) - (r_color(color2))) / dist;
+	fade[1] = (float)((g_color(color1)) - (g_color(color2))) / dist;
+	fade[2] = (float)((b_color(color1)) - (b_color(color2))) / dist;
+}
 void	load_color_map(t_fdf *fdf)
 {
 	int		i;
 	int		n;
 	int		c[4];
-	float	fade_comp[3];
+	float	fade[3];
 	
 	i = 0;
-	n = 0;
-	fade_comp[0] = (float)((r_color(DEFAULT_COLOR_MAX)) - (r_color(DEFAULT_COLOR_MIN))) / fdf->z_diff;
-	fade_comp[1] = (float)((g_color(DEFAULT_COLOR_MAX)) - (g_color(DEFAULT_COLOR_MIN))) / fdf->z_diff;
-	fade_comp[2] = (float)((b_color(DEFAULT_COLOR_MAX)) - (b_color(DEFAULT_COLOR_MIN))) / fdf->z_diff;
-	printf("diff %i\n", fdf->z_diff);
 	while (i < fdf->map_size)
 	{
-		n = fdf->z_diff - (fdf->z_diff - fabs(fdf->map[i].z));
-		c[0] = t_color(DEFAULT_COLOR_MIN);
-		c[1] = r_color(DEFAULT_COLOR_MIN) + (fade_comp[0] * n);
-		c[2] = g_color(DEFAULT_COLOR_MIN) + (fade_comp[1] * n);
-		c[3] = b_color(DEFAULT_COLOR_MIN) + (fade_comp[2] * n);
+		c[0] = t_color(DEF_COLOR);
+		if (fdf->map[i].z > 0)
+		{
+			n = fdf->z_max - (fdf->z_max - fdf->map[i].z);
+			set_fade_map(fade, DEF_COLOR_MAX, DEF_COLOR, fdf->z_max);
+		}
+		else
+		{
+			n = abs(fdf->z_min) - (abs(fdf->z_min) - fabs(fdf->map[i].z));
+			set_fade_map(fade, DEF_COLOR_MIN, DEF_COLOR, abs(fdf->z_min));
+		}
+		c[1] = r_color(DEF_COLOR) + (fade[0] * n);
+		c[2] = g_color(DEF_COLOR) + (fade[1] * n);
+		c[3] = b_color(DEF_COLOR) + (fade[2] * n);
 		fdf->map[i].color = trgb_color(c[0], c[1], c[2], c[3]);
 		i++;
 	}
-
 }
 
 void    get_map_coords(t_fdf *fdf, char *map_addr)
@@ -960,7 +970,7 @@ void    get_map_coords(t_fdf *fdf, char *map_addr)
 				fdf->map[aux].color = get_color((ft_split(temp[i], ',')[1]));
 			}
 			else
-				fdf->map[aux].color = DEFAULT_COLOR;
+				fdf->map[aux].color = DEF_COLOR;
 			i++;
 			aux++;
 		}
