@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/18 20:54:37 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/18 21:13:53 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,5 +216,7 @@ void	scale_map(t_fdf *fdf);
 void	set_z_scaling(t_fdf *fdf);
 void	rotate_cube(t_fdf *fdf, t_cube *cube);
 void	init_cube(t_cube *cube);
+int		check_load(t_fdf *fdf);
+int		check_enter(t_fdf *fdf);
 
 #endif

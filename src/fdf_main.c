@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/18 21:05:38 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/18 21:13:27 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -706,6 +706,8 @@ int	mouse_press(int button, int x, int y, void *fdf_B)
 	t_fdf *fdf;
 
 	fdf = fdf_B;
+	if (!check_enter(fdf) || !check_load(fdf))
+		return (0);
 	if (button == 1)
 	{
 		fdf->is_left_mouse_pres = 1;
@@ -724,7 +726,6 @@ int	mouse_press(int button, int x, int y, void *fdf_B)
 		zoom_map(fdf, 1.1);
 	else if (button == 5)
 		zoom_map(fdf, 0.9);
-	//printf("PPPP%i --- %i --- %i\n", button, x, y);
 	return (0);
 }
 
@@ -756,9 +757,9 @@ int	mouse_move(int x, int y, void *fdf_B)
 	int		dist_y;
 
 	fdf = fdf_B;
-	if (!fdf->is_right_mouse_pres && !fdf->is_left_mouse_pres)
+	if (!check_enter(fdf) || (!fdf->is_right_mouse_pres && !fdf->is_left_mouse_pres))
 		return (0);
-	if (fdf->mouse_tracker++ % fdf->mouse_delayer)
+	if (!check_load(fdf) || (fdf->mouse_tracker++ % fdf->mouse_delayer))
 		return (0);
 	dist_x = (x - fdf->mouse_x);
 	dist_y = (y - fdf->mouse_y);
