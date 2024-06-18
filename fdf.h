@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/17 21:28:51 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/18 20:54:37 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,12 @@ typedef struct s_coords{
 	int 	color;
 }       	t_coords;
 
+typedef struct s_cube{
+	t_coords    coord[8];
+	t_coords    coord_backup[8];
+	int     	pad;
+}           	t_cube;
+
 typedef struct s_fdf{
 	void        *mlx_ptr;
 	void        *win_ptr;
@@ -147,13 +153,14 @@ typedef struct s_fdf{
 	int			z_diff;
 	int			load_flag;
 	int			entered;
+	int			test;
 	float		z_factor;
 	float       spacing_W;
 	float       spacing_H;
 	float		zoom;
-	int			test;
 	t_coords    *map;
 	t_coords    *backup_map;
+	t_cube		cube;
 }               t_fdf;
 
 typedef struct s_point{
@@ -207,5 +214,7 @@ void	rotate_z(t_coords *pt, float angle);
 void	rotate_map(t_fdf *fdf, int deg_x, int deg_y, int deg_z);
 void	scale_map(t_fdf *fdf);
 void	set_z_scaling(t_fdf *fdf);
+void	rotate_cube(t_fdf *fdf, t_cube *cube);
+void	init_cube(t_cube *cube);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/17 21:46:57 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/18 21:05:38 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ void    init_fdf(t_fdf *fdf)
 	fdf->load_flag = 0;
 	fdf->entered = 0;
 	fdf->test = 0;
+	init_cube(&fdf->cube);
 }
 
 int trgb_color(int t, int r, int g, int b)
@@ -360,9 +361,144 @@ void    draw_scene_five(t_fdf *fdf)
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
 
-void    draw_scene_six(t_fdf *fdf)
+void	scale_cube(t_fdf *fdf, t_cube *cube)
 {
-	fdf->load_flag = 1;
+	int i;
+
+	i = 0;
+	fdf->shift_tracker = 0;
+	while (i < 8)
+	{
+		cube->coord[i].x = (WINW * 0.05) + (cube->pad * cube->coord[i].x);
+		cube->coord[i].y = (WINH * 0.075) + (cube->pad * cube->coord[i].y);
+		i++;
+	}
+}
+
+void	rotate_cube(t_fdf *fdf, t_cube *cube)
+{
+	int i;
+
+	i = 0;
+	while (i < 8)
+	{
+		rotate_x(&cube->coord[i], (fdf->rot_deg[X] * PI / 180));
+		rotate_y(&cube->coord[i], (fdf->rot_deg[Y] * PI / 180));
+		rotate_z(&cube->coord[i], (fdf->rot_deg[Z] * PI / 180));
+		i++;
+	}
+}
+
+void	reset_cube(t_cube *cube)
+{
+	int i;
+
+	i = 0;
+	while (i < 8)	
+	{
+		cube->coord[i] = cube->coord_backup[i];
+		i++;		
+	}
+}
+
+void	get_backup_cube(t_cube *cube)
+{
+	int i;
+
+	i = 0;
+	while (i < 8)
+	{
+		cube->coord_backup[i] = cube->coord[i];
+		i++;
+	}
+}
+
+void	init_cube(t_cube *cube)
+{
+	int i;
+
+	i = 0;
+	cube->pad = 80;
+	while (i < 8)
+	{
+		cube->coord[i].x = 0.5;
+		cube->coord[i].y = 0.5;
+		cube->coord[i].z = 0.5;
+		cube->coord[i].color = GRAY_LIGHT;
+		i++;
+	}
+	cube->coord[0].x = -0.5;
+	cube->coord[0].y = -0.5;
+	cube->coord[0].z = -0.5;
+	cube->coord[1].y = -0.5;
+	cube->coord[1].z = -0.5;
+	cube->coord[2].z = -0.5;
+	cube->coord[3].x = -0.5;
+	cube->coord[3].z = -0.5;
+	cube->coord[4].x = -0.5;
+	cube->coord[4].y = -0.5;
+	cube->coord[5].y = -0.5;
+	cube->coord[7].x = -0.5;
+	get_backup_cube(cube);
+}
+
+void	set_color_cube(t_cube *cube, int a, int b)
+{
+	if (a == 0 && b == 1)
+	{
+		cube->coord[a].color = RED;
+		cube->coord[b].color = RED;
+	}
+	else if (a == 3 && b == 0)
+	{
+		cube->coord[a].color = GREEN;
+		cube->coord[b].color = GREEN;
+	}
+	else if (a == 0 && b == 4)
+	{
+		cube->coord[a].color = BLUE;
+		cube->coord[b].color = BLUE;
+	}
+	else 
+	{
+		cube->coord[a].color = GRAY_LIGHT;
+		cube->coord[b].color = GRAY_LIGHT;		
+	}
+}
+
+void	bres_cube(t_fdf *fdf, t_cube *cube)
+{
+	int		i;
+	int		aux;
+
+	i = 0;
+	aux = 1;
+	while (i < 8)
+	{
+		if (i < 4)
+			aux = aux % 4;
+		else
+			aux = (aux % 4) + 4;
+		set_color_cube(cube, i, aux);
+		init_bresenham_line(&fdf->b_ground, &cube->coord[i], &cube->coord[aux]);
+		i++;
+		aux++;
+	}
+	i = 0;
+	while (i < 4)
+	{
+		set_color_cube(cube, i, i + 4);		
+		init_bresenham_line(&fdf->b_ground, &cube->coord[i], &cube->coord[i + 4]);
+		i++;
+	}
+}
+
+void    draw_cube(t_fdf *fdf)
+{
+	reset_cube(&fdf->cube);
+	rotate_cube(fdf, &fdf->cube);
+	scale_cube(fdf, &fdf->cube);
+	bres_cube(fdf, &fdf->cube);
 }
 
 void    draw_map(t_fdf *fdf)
@@ -410,6 +546,7 @@ void    draw_map(t_fdf *fdf)
 	f_pt.x = WINW;
 	f_pt.y = WINH / 2;
 	init_bresenham_line(&fdf->b_ground, &i_pt, &f_pt);*/
+	draw_cube(fdf);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
 
@@ -638,8 +775,6 @@ int	mouse_move(int x, int y, void *fdf_B)
 		rotate_key(fdf, dist_y / 2, dist_x / 2, 0);
 	fdf->mouse_x = x;
 	fdf->mouse_y = y;
-	//fdf->mouse_tracker = 0;
-	//printf("MMMM%f --- %f\n", dist_x, dist_y);
 	return (0);
 }
 
@@ -696,7 +831,7 @@ int key_hook(int keycode, void *fdf)
 	else if (keycode == FIVE_KEY)
 		draw_scene_five(fdf);
 	else if (keycode == SIX_KEY)
-		draw_scene_six(fdf);
+		draw_cube(fdf);
 	else if (keycode == M_KEY)
 		draw_welcome_menu(fdf);
 	else if (keycode == W_KEY)
@@ -761,20 +896,17 @@ int	loop_hook(t_fdf *fdf)
 	int		b;
 
 	if (fdf->animate)
-	{
 		rotate_key(fdf, 0, -1, 0);
-		return (0);
-	}
 	if (fdf->load_flag && !fdf->entered)
 	{
 		color = 0;
 		fdf->test = fdf->test % 360;
-		fade[0] = (float)((r_color(DEF_COLOR_MAX)) - (r_color(BLACK))) / 360;
-		fade[1] = (float)((g_color(DEF_COLOR_MAX)) - (g_color(BLACK))) / 360;
-		fade[2] = (float)((b_color(DEF_COLOR_MAX)) - (b_color(BLACK))) / 360;
-		r = r_color(BLACK) + (fade[0] * fdf->test);
-		g = g_color(BLACK) + (fade[1] * fdf->test);
-		b = b_color(BLACK) + (fade[2] * fdf->test);
+		fade[0] = (float)((r_color(BLACK)) - (r_color(DEF_COLOR_MAX))) / 360;
+		fade[1] = (float)((g_color(BLACK)) - (g_color(DEF_COLOR_MAX))) / 360;
+		fade[2] = (float)((b_color(BLACK)) - (b_color(DEF_COLOR_MAX))) / 360;
+		r = r_color(DEF_COLOR_MAX) + (fade[0] * fdf->test);
+		g = g_color(DEF_COLOR_MAX) + (fade[1] * fdf->test);
+		b = b_color(DEF_COLOR_MAX) + (fade[2] * fdf->test);
 		color = trgb_color(0, r, g, b);
 		draw_circle_inward(CENTER_X, CENTER_Y, 400, 0, 3000, color, BLACK, 0.8, &fdf->b_ground, 4);
 		mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
@@ -1179,12 +1311,12 @@ void	set_mouse_delayer(t_fdf *fdf)
 
 void	set_z_scaling(t_fdf *fdf)
 {
-	if (0 < fdf->map_size && fdf->map_size < 500)
-		fdf->z_factor = fdf->zoom;
-	else if (500 < fdf->map_size && fdf->map_size < 20000)
-		fdf->z_factor = 2 * fdf->zoom;
-	else if (20000 < fdf->map_size)
-		fdf->z_factor = 4 * fdf->zoom;
+	if (0 < fdf->z_diff && fdf->z_diff < 500)
+		fdf->z_factor = 1;
+	else if (500 < fdf->z_diff && fdf->z_diff < 2000)
+		fdf->z_factor = 0.2;
+	else if (2000 < fdf->z_diff)
+		fdf->z_factor = 0.1;
 }
 
 void	set_map_dim(t_fdf *fdf, char *map_addr)
@@ -1205,11 +1337,11 @@ void    process_map(t_fdf *fdf, char *map_addr)
 	draw_loading_screen(fdf, 0.22);
 	set_mouse_delayer(fdf);
 	draw_loading_screen(fdf, 0.34);
-	set_z_scaling(fdf);
-	draw_loading_screen(fdf, 0.46);
 	get_map_coords(fdf, map_addr);
-	draw_loading_screen(fdf, 0.68);
+	draw_loading_screen(fdf, 0.46);
 	get_z_diff(fdf);
+	set_z_scaling(fdf);
+	draw_loading_screen(fdf, 0.68);
 	if (!fdf->color_flag)
 		load_color_map(fdf);
 	draw_loading_screen(fdf, 0.8);
@@ -1298,8 +1430,7 @@ int main(int argc, char **argv)
 
 	if (argc != 2 || !ft_strnstr(argv[1], ".fdf", ft_strlen(argv[1])))
 		file_err(argv[1]);
-	else
-		init_fdf(&fdf);
+	init_fdf(&fdf);
 	draw_loading_screen(&fdf, 0.1);
 	process_map(&fdf, argv[1]);
 	//draw_welcome_menu(&fdf);
