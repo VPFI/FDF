@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/18 21:13:53 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/19 17:12:11 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,6 +216,9 @@ void	scale_map(t_fdf *fdf);
 void	set_z_scaling(t_fdf *fdf);
 void	rotate_cube(t_fdf *fdf, t_cube *cube);
 void	init_cube(t_cube *cube);
+void    write_str(t_fdf *fdf, char *msg, int x, int y, int size);
+void    my_mlx_pixel_put(t_img *img, int x, int y, int color);
+void    init_img_data(t_img *img, void *mlx);
 int		check_load(t_fdf *fdf);
 int		check_enter(t_fdf *fdf);
 

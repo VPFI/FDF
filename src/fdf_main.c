@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/18 21:13:27 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/19 18:30:48 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void    free_arr(char **arr)
 	}
 }
 
-void    my_mlx_pixel_put(t_img *img, int x, int y, int color)
+void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
 {
 	char    *dst;
 
@@ -51,6 +51,7 @@ void    init_fdf(t_fdf *fdf)
 {
 	fdf->mlx_ptr = mlx_init();
 	fdf->win_ptr = mlx_new_window(fdf->mlx_ptr, WINW, WINH, "FDF");
+	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
 	fdf->rot_deg[X] = 0;
 	fdf->rot_deg[Y] = 0;
 	fdf->rot_deg[Z] = 0;
@@ -832,7 +833,7 @@ int key_hook(int keycode, void *fdf)
 	else if (keycode == FIVE_KEY)
 		draw_scene_five(fdf);
 	else if (keycode == SIX_KEY)
-		draw_cube(fdf);
+		write_str(fdf, "hola", CENTER_X - 200, CENTER_Y, 3);
 	else if (keycode == M_KEY)
 		draw_welcome_menu(fdf);
 	else if (keycode == W_KEY)
@@ -900,16 +901,23 @@ int	loop_hook(t_fdf *fdf)
 		rotate_key(fdf, 0, -1, 0);
 	if (fdf->load_flag && !fdf->entered)
 	{
+		if (fdf->b_ground.img_ptr)
+			mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
+		init_img_data(&fdf->b_ground, fdf->mlx_ptr);
 		color = 0;
 		fdf->test = fdf->test % 360;
-		fade[0] = (float)((r_color(BLACK)) - (r_color(DEF_COLOR_MAX))) / 360;
-		fade[1] = (float)((g_color(BLACK)) - (g_color(DEF_COLOR_MAX))) / 360;
-		fade[2] = (float)((b_color(BLACK)) - (b_color(DEF_COLOR_MAX))) / 360;
-		r = r_color(DEF_COLOR_MAX) + (fade[0] * fdf->test);
-		g = g_color(DEF_COLOR_MAX) + (fade[1] * fdf->test);
-		b = b_color(DEF_COLOR_MAX) + (fade[2] * fdf->test);
+		fade[0] = (float)((r_color(DEF_COLOR_MAX)) - (r_color(BLACK))) / 360;
+		fade[1] = (float)((g_color(DEF_COLOR_MAX)) - (g_color(BLACK))) / 360;
+		fade[2] = (float)((b_color(DEF_COLOR_MAX)) - (b_color(BLACK))) / 360;
+		r = r_color(BLACK) + (fade[0] * fdf->test);
+		g = g_color(BLACK) + (fade[1] * fdf->test);
+		b = b_color(BLACK) + (fade[2] * fdf->test);
 		color = trgb_color(0, r, g, b);
-		draw_circle_inward(CENTER_X, CENTER_Y, 400, 0, 3000, color, BLACK, 0.8, &fdf->b_ground, 4);
+		draw_circle_inward(CENTER_X, CENTER_Y - 100, 400, 0, 3000, color, BLACK, 0.8, &fdf->b_ground, 4);
+		draw_circle_outward(CENTER_X, CENTER_Y - 100, 400, 410, 3000, CYAN_GULF, BLACK, 0.03, &fdf->b_ground);
+		write_str(fdf, "ENT", 860, 1065, 3);
+		write_str(fdf, "ER", 1025, 1065, 3);
+		write_str(fdf, ">>>", 915, 1140, 3);
 		mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 		fdf->test++;
 	}
@@ -955,8 +963,11 @@ void    draw_loading_screen(t_fdf *fdf, float perc)
 	if (fdf->b_ground.img_ptr)
 		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
-	draw_circle_outward(CENTER_X, CENTER_Y, 400, 410, 3000, CYAN_GULF, BLACK, 0.03, &fdf->b_ground);
-	draw_circle_loading(CENTER_X, CENTER_Y, 400, 0, 3000, CYAN_GULF, BLACK, 0.7, &fdf->b_ground, perc);
+	draw_circle_outward(CENTER_X, CENTER_Y - 100, 400, 410, 3000, CYAN_GULF, BLACK, 0.03, &fdf->b_ground);
+	draw_circle_loading(CENTER_X, CENTER_Y - 100, 400, 0, 3000, CYAN_GULF, BLACK, 0.7, &fdf->b_ground, perc);
+	write_str(fdf, "LOADI", 800, 1065, 3);
+	write_str(fdf, "NG", 1065, 1065, 3);
+	write_str(fdf, "---", 915, 1140, 3);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 	if (perc == 1)
 		fdf->load_flag = 1;
@@ -1434,7 +1445,6 @@ int main(int argc, char **argv)
 	init_fdf(&fdf);
 	draw_loading_screen(&fdf, 0.1);
 	process_map(&fdf, argv[1]);
-	//draw_welcome_menu(&fdf);
 	mlx_hook(fdf.win_ptr, KEYDOWN, KEYPRESS_M, key_hook, (void *)&fdf);
 	mlx_hook(fdf.win_ptr, KEYUP, KEYRELEASE_M, key_hook_release, (void *)&fdf);
 	mlx_hook(fdf.win_ptr, DESTROY, STRUCTNOTIFY_M, close_all, &fdf);
