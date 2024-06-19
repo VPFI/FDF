@@ -6,7 +6,7 @@
 #    By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/23 13:59:42 by vperez-f          #+#    #+#              #
-#    Updated: 2024/06/17 21:45:57 by vperez-f         ###   ########.fr        #
+#    Updated: 2024/06/19 17:27:25 by vperez-f         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ END=\033[0m
 
 NAME = fdf
 
-CFILES = fdf_main.c
+CFILES = fdf_main.c font.c
 
 OFILES = $(CFILES:%.c=%.o)
 
