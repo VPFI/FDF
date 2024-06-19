@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/19 20:26:16 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/19 21:44:19 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,10 +107,6 @@
 # define EXPOSE 12
 # define DESTROY 17
 
-typedef struct s_snake{
-
-}           t_snake;
-
 typedef struct  s_img {
 	void    *img_ptr;
 	char    *addr;
@@ -125,6 +121,12 @@ typedef struct s_coords{
 	float   z;
 	int 	color;
 }       	t_coords;
+
+typedef struct s_snake{
+	t_coords			self_pos;
+	t_coords			prev_pos;
+	struct s_snake		*next;
+}           			t_snake;
 
 typedef struct s_cube{
 	t_coords    coord[8];
@@ -224,7 +226,11 @@ void	init_cube(t_cube *cube);
 void    write_str(t_fdf *fdf, char *msg, int x, int y, int size);
 void    my_mlx_pixel_put(t_img *img, int x, int y, int color);
 void    init_img_data(t_img *img, void *mlx);
+void    draw_circle_inward(float center_x, float center_y, int radius, int inner_radius, float smothness, int color1, int color2, float fade, t_img *img, int mode);
+void    draw_circle_outward(float center_x, float center_y, int radius, int outer_radius, float smothness, int color1, int color2, float fade, t_img *img);
 int		check_load(t_fdf *fdf);
 int		check_enter(t_fdf *fdf);
+
+void	init_snake(t_fdf *fdf);
 
 #endif

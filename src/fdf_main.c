@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/19 20:24:09 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/19 21:26:10 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -825,7 +825,7 @@ int key_hook(int keycode, void *fdf)
 	else if (keycode == FIVE_KEY)
 		draw_scene_five(fdf);
 	else if (keycode == SIX_KEY)
-		write_str(fdf, "hola", CENTER_X - 200, CENTER_Y, 3);
+		init_snake(fdf);
 	else if (keycode == M_KEY)
 		draw_welcome_menu(fdf);
 	else if (keycode == W_KEY)
@@ -937,7 +937,6 @@ void    draw_sides(t_fdf *fdf, float extent, float y_start, float y_finish, int 
 	while (pt.x < extent)
 	{
 		pt.y = y_base;
-		//set_fade(&pt, pt.og_color, BLACK, WINH * 0.25);while (pt.y < WINH * 0.25)
 		while (pt.y < y_finish)
 		{
 			my_mlx_pixel_put(&fdf->b_ground, pt.x, pt.y, pt.color);
