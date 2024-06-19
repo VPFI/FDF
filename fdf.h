@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/19 17:12:11 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/19 20:26:16 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,10 @@
 # define EXPOSE 12
 # define DESTROY 17
 
+typedef struct s_snake{
+
+}           t_snake;
+
 typedef struct  s_img {
 	void    *img_ptr;
 	char    *addr;
@@ -153,7 +157,8 @@ typedef struct s_fdf{
 	int			z_diff;
 	int			load_flag;
 	int			entered;
-	int			test;
+	int			animation_steps;
+	int			increment;
 	float		z_factor;
 	float       spacing_W;
 	float       spacing_H;

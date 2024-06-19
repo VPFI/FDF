@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/19 18:30:48 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/19 20:24:09 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,8 @@ void    init_fdf(t_fdf *fdf)
 	fdf->shift_tracker = 0;
 	fdf->load_flag = 0;
 	fdf->entered = 0;
-	fdf->test = 0;
+	fdf->animation_steps = 0;
+	fdf->increment = 1;
 	init_cube(&fdf->cube);
 }
 
@@ -362,12 +363,11 @@ void    draw_scene_five(t_fdf *fdf)
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
 
-void	scale_cube(t_fdf *fdf, t_cube *cube)
+void	scale_cube(t_cube *cube)
 {
 	int i;
 
 	i = 0;
-	fdf->shift_tracker = 0;
 	while (i < 8)
 	{
 		cube->coord[i].x = (WINW * 0.05) + (cube->pad * cube->coord[i].x);
@@ -498,7 +498,7 @@ void    draw_cube(t_fdf *fdf)
 {
 	reset_cube(&fdf->cube);
 	rotate_cube(fdf, &fdf->cube);
-	scale_cube(fdf, &fdf->cube);
+	scale_cube(&fdf->cube);
 	bres_cube(fdf, &fdf->cube);
 }
 
@@ -536,18 +536,10 @@ void    draw_map(t_fdf *fdf)
 		init_bresenham_line(&fdf->b_ground, &i_pt, &f_pt);
 		i++;
 	}
-	/*
-	i_pt.x = WINW / 2;
-	i_pt.y = 0;
-	f_pt.x = WINW / 2;
-	f_pt.y = WINH;
-	init_bresenham_line(&fdf->b_ground, &i_pt, &f_pt);
-	i_pt.x = 0;
-	i_pt.y = WINH / 2;
-	f_pt.x = WINW;
-	f_pt.y = WINH / 2;
-	init_bresenham_line(&fdf->b_ground, &i_pt, &f_pt);*/
 	draw_cube(fdf);
+	write_str(fdf, "FDF", WINW * 0.9, WINH * 0.06, 4);
+	write_str(fdf, "_", WINW * 0.901, WINH * 0.06, 1);
+	write_str(fdf, "42", WINW * 0.915, WINH * 0.14, 6);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 }
 
@@ -885,7 +877,6 @@ int	key_hook_release(int keycode, void *fdf)
 {
 	if (keycode == SHIFT_KEY)
 		shift_tracker(fdf);
-	
 	return (0);
 }
 
@@ -893,9 +884,7 @@ int	loop_hook(t_fdf *fdf)
 {
 	int		color;
 	float	fade[3];
-	int		r;
-	int		g;
-	int		b;
+	int		color_comp[3];
 
 	if (fdf->animate)
 		rotate_key(fdf, 0, -1, 0);
@@ -904,22 +893,24 @@ int	loop_hook(t_fdf *fdf)
 		if (fdf->b_ground.img_ptr)
 			mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 		init_img_data(&fdf->b_ground, fdf->mlx_ptr);
-		color = 0;
-		fdf->test = fdf->test % 360;
-		fade[0] = (float)((r_color(DEF_COLOR_MAX)) - (r_color(BLACK))) / 360;
-		fade[1] = (float)((g_color(DEF_COLOR_MAX)) - (g_color(BLACK))) / 360;
-		fade[2] = (float)((b_color(DEF_COLOR_MAX)) - (b_color(BLACK))) / 360;
-		r = r_color(BLACK) + (fade[0] * fdf->test);
-		g = g_color(BLACK) + (fade[1] * fdf->test);
-		b = b_color(BLACK) + (fade[2] * fdf->test);
-		color = trgb_color(0, r, g, b);
+		fade[0] = (float)((r_color(BLACK)) - (r_color(DEF_COLOR_MAX))) / 180;
+		fade[1] = (float)((g_color(BLACK)) - (g_color(DEF_COLOR_MAX))) / 180;
+		fade[2] = (float)((b_color(BLACK)) - (b_color(DEF_COLOR_MAX))) / 180;
+		color_comp[0] = r_color(DEF_COLOR_MAX) + (fade[0] * fdf->animation_steps);
+		color_comp[1] = g_color(DEF_COLOR_MAX) + (fade[1] * fdf->animation_steps);
+		color_comp[2] = b_color(DEF_COLOR_MAX) + (fade[2] * fdf->animation_steps);
+		color = trgb_color(0, color_comp[0], color_comp[1], color_comp[2]);
 		draw_circle_inward(CENTER_X, CENTER_Y - 100, 400, 0, 3000, color, BLACK, 0.8, &fdf->b_ground, 4);
 		draw_circle_outward(CENTER_X, CENTER_Y - 100, 400, 410, 3000, CYAN_GULF, BLACK, 0.03, &fdf->b_ground);
-		write_str(fdf, "ENT", 860, 1065, 3);
-		write_str(fdf, "ER", 1025, 1065, 3);
-		write_str(fdf, ">>>", 915, 1140, 3);
+		write_str(fdf, "ENT", WINW * 0.43, WINH * 0.819, 3);
+		write_str(fdf, "ER", WINW * 0.513, WINH * 0.819, 3);
+		write_str(fdf, ">>>", WINW * 0.458, WINH * 0.877, 3);
 		mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
-		fdf->test++;
+		if (fdf->animation_steps == 180)
+			fdf->increment = -1;
+		if (fdf->animation_steps == 0)
+			fdf->increment = 1;
+		fdf->animation_steps += fdf->increment;
 	}
 	return (0);
 }
@@ -965,9 +956,9 @@ void    draw_loading_screen(t_fdf *fdf, float perc)
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
 	draw_circle_outward(CENTER_X, CENTER_Y - 100, 400, 410, 3000, CYAN_GULF, BLACK, 0.03, &fdf->b_ground);
 	draw_circle_loading(CENTER_X, CENTER_Y - 100, 400, 0, 3000, CYAN_GULF, BLACK, 0.7, &fdf->b_ground, perc);
-	write_str(fdf, "LOADI", 800, 1065, 3);
-	write_str(fdf, "NG", 1065, 1065, 3);
-	write_str(fdf, "---", 915, 1140, 3);
+	write_str(fdf, "LOADI", WINW * 0.4, WINH * 0.819, 3);
+	write_str(fdf, "NG", WINW * 0.533, WINH * 0.819, 3);
+	write_str(fdf, "---", WINW * 0.458, WINH * 0.877, 3);
 	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
 	if (perc == 1)
 		fdf->load_flag = 1;
