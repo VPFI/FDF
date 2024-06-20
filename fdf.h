@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/19 21:44:19 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/20 20:37:44 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,7 @@
 # define SLASH_KEY 0x2f
 # define SPACE_KEY 0x20
 # define SHIFT_KEY 0xffe1
+# define EIGHT_KEY 0xffb8
 
 # define KEYPRESS_M (1L<<0)
 # define KEYRELEASE_M (1L<<1)
@@ -128,6 +129,15 @@ typedef struct s_snake{
 	struct s_snake		*next;
 }           			t_snake;
 
+typedef struct s_sframe{
+	int		food;
+	int		dir;
+	int		s_delayer;
+	int		f_radius;
+	int		s_radius;
+	t_coords	food_pos[5];
+}			t_sframe;
+
 typedef struct s_cube{
 	t_coords    coord[8];
 	t_coords    coord_backup[8];
@@ -161,6 +171,7 @@ typedef struct s_fdf{
 	int			entered;
 	int			animation_steps;
 	int			increment;
+	int			snake_flag;
 	float		z_factor;
 	float       spacing_W;
 	float       spacing_H;
@@ -168,6 +179,8 @@ typedef struct s_fdf{
 	t_coords    *map;
 	t_coords    *backup_map;
 	t_cube		cube;
+	t_snake		*snake;
+	t_sframe	s_frame;
 }               t_fdf;
 
 typedef struct s_point{
@@ -232,5 +245,7 @@ int		check_load(t_fdf *fdf);
 int		check_enter(t_fdf *fdf);
 
 void	init_snake(t_fdf *fdf);
+void	move_snake(t_fdf *fdf, t_snake *snake, int dist, int dir);
+void	move_snake_loop(t_fdf *fdf, t_sframe *sframe);
 
 #endif
