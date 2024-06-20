@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/19 21:26:10 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/20 20:21:33 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
 {
 	char    *dst;
 
-	if (x > WINW || y > WINH || x < 0 || y < 0)
+	if (x >= WINW || y >= WINH || x < 0 || y < 0)
 		return ;
 	dst = img->addr + (y * img->line_length + x * (img->bpp / 8));
 	*(unsigned int*)dst = color;
@@ -73,6 +73,7 @@ void    init_fdf(t_fdf *fdf)
 	fdf->entered = 0;
 	fdf->animation_steps = 0;
 	fdf->increment = 1;
+	fdf->snake_flag = 0;
 	init_cube(&fdf->cube);
 }
 
@@ -570,6 +571,12 @@ void	move_key(t_fdf *fdf, int dist, int dir)
 	int	i;
 
 	i = 0;
+	if (0 < fdf->snake_flag)
+	{
+		dist *= 2;
+		move_snake(fdf, fdf->snake, dist, dir);
+		return ;
+	}
 	if (!dist)
 		return ;
 	while (i < fdf->map_size)
@@ -584,7 +591,6 @@ void	move_key(t_fdf *fdf, int dist, int dir)
 		fdf->tras[Y] += dist;
 	else if (!dir)
 		fdf->tras[X] += dist;
-	//printf("MOVE || X: %i -- Y: %i\n", fdf->tras[X], fdf->tras[Y]);
 	draw_map(fdf);
 }
 
@@ -886,6 +892,10 @@ int	loop_hook(t_fdf *fdf)
 	float	fade[3];
 	int		color_comp[3];
 
+	if (fdf->s_frame.dir && fdf->snake_flag == 1)
+	{
+		move_snake_loop(fdf, &fdf->s_frame);
+	}
 	if (fdf->animate)
 		rotate_key(fdf, 0, -1, 0);
 	if (fdf->load_flag && !fdf->entered)

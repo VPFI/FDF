@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 13:41:44 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/19 18:15:21 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/20 15:08:12 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,6 +133,7 @@ void    write_str(t_fdf *fdf, char *msg, int x, int y, int size)
 		free(temp_line);
 		draw_letter(fdf, points, param);
 		free(points);
+		close(l_file);
 		param[3]++;
 	}
 }
