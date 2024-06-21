@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/20 20:37:44 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/21 20:04:22 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@
 # define H_PI   1.5708
 # define CENTER_X WINW / 2
 # define CENTER_Y WINH / 2
+# define ENEM 2 
+# define FOOD 5
 
 # define DEF_COLOR 0x1A1A1A
 # define DEF_COLOR_MAX 0xC9DFEC
@@ -123,6 +125,12 @@ typedef struct s_coords{
 	int 	color;
 }       	t_coords;
 
+typedef struct s_enemy{
+	t_coords	center;
+	t_coords	target_pos;
+	int			radius;
+}           	t_enemy;
+
 typedef struct s_snake{
 	t_coords			self_pos;
 	t_coords			prev_pos;
@@ -130,12 +138,14 @@ typedef struct s_snake{
 }           			t_snake;
 
 typedef struct s_sframe{
-	int		food;
-	int		dir;
-	int		s_delayer;
-	int		f_radius;
-	int		s_radius;
-	t_coords	food_pos[5];
+	int				food;
+	int				dir;
+	int				s_delayer;
+	int				score;
+	int				f_radius;
+	int				s_radius;
+	struct s_enemy	enemy[ENEM];
+	t_coords	food_pos[FOOD];
 }			t_sframe;
 
 typedef struct s_cube{
@@ -247,5 +257,6 @@ int		check_enter(t_fdf *fdf);
 void	init_snake(t_fdf *fdf);
 void	move_snake(t_fdf *fdf, t_snake *snake, int dist, int dir);
 void	move_snake_loop(t_fdf *fdf, t_sframe *sframe);
+void	snake_lstclear(t_snake **lst);
 
 #endif
