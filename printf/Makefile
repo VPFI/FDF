@@ -6,7 +6,7 @@
 #    By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/09 17:34:45 by vperez-f          #+#    #+#              #
-#    Updated: 2024/02/08 17:32:56 by vperez-f         ###   ########.fr        #
+#    Updated: 2024/06/21 15:30:18 by vperez-f         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,4 +42,4 @@ fclean:	clean
 
 re:	fclean all
 
-.PHONY = all clean fclean re
+.PHONY: all clean fclean re

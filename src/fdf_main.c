@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:26:53 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/20 20:21:33 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/21 17:06:09 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ void    free_arr(char **arr)
 			arr[i] = NULL;
 			i++;
 		}
-		free(arr[i]);
 		free(arr);
 	}
 }
@@ -301,8 +300,23 @@ void    draw_circle_outward(float center_x, float center_y, int radius, int oute
 	}
 }
 
+void	free_maps(t_coords **map)
+{
+	if (map)
+	{
+		if (*map)
+			free(*map);
+	}
+}
+
 int	close_all(t_fdf *fdf)
 {
+	if (fdf->snake)
+		snake_lstclear(&fdf->snake);
+	if (fdf->map)
+		free_maps(&fdf->map);
+	if (fdf->backup_map)
+		 free_maps(&fdf->backup_map);
 	if (fdf->b_ground.img_ptr)
 		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	if (fdf->win_ptr)
@@ -315,7 +329,6 @@ int	close_all(t_fdf *fdf)
 
 void    draw_scene_one(t_fdf *fdf)
 {
-	//add img_ptr as param make it generic
 	if (fdf->b_ground.img_ptr)
 		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
@@ -812,6 +825,9 @@ int	check_enter(t_fdf *fdf)
 
 int key_hook(int keycode, void *fdf)
 {
+	t_fdf *test;
+
+	test = fdf;
 	if (keycode == ESC_KEY)
 		close_all(fdf);
 	else if (!check_load(fdf))
@@ -831,7 +847,9 @@ int key_hook(int keycode, void *fdf)
 	else if (keycode == FIVE_KEY)
 		draw_scene_five(fdf);
 	else if (keycode == SIX_KEY)
+	{
 		init_snake(fdf);
+	}
 	else if (keycode == M_KEY)
 		draw_welcome_menu(fdf);
 	else if (keycode == W_KEY)
@@ -893,9 +911,7 @@ int	loop_hook(t_fdf *fdf)
 	int		color_comp[3];
 
 	if (fdf->s_frame.dir && fdf->snake_flag == 1)
-	{
 		move_snake_loop(fdf, &fdf->s_frame);
-	}
 	if (fdf->animate)
 		rotate_key(fdf, 0, -1, 0);
 	if (fdf->load_flag && !fdf->entered)
@@ -1153,6 +1169,7 @@ void	load_color_map(t_fdf *fdf)
 void    get_map_coords(t_fdf *fdf, char *map_addr)
 {
 	char    **temp;
+	char    **temp_color;
 	char    *line;
 	char	*temp_line;
 	int     i;
@@ -1164,6 +1181,7 @@ void    get_map_coords(t_fdf *fdf, char *map_addr)
 	j = 0;
 	temp = NULL;
 	temp_line = NULL;
+	temp_color = NULL;
 	aux = 0;
 	map = open(map_addr, O_RDONLY);
 	if (map < 0)
@@ -1186,9 +1204,10 @@ void    get_map_coords(t_fdf *fdf, char *map_addr)
 			fdf->map[aux].z = ft_atoi(temp[i]);
 			if (check_color(temp[i]))
 			{	
-				fdf->color_flag = 1;	
-				fdf->map[aux].color = get_color((ft_split(temp[i], ',')[1]));
-				//free this split
+				fdf->color_flag = 1;
+				temp_color = ft_split(temp[i], ',');
+				fdf->map[aux].color = get_color(temp_color[1]);
+				free_arr(temp_color);
 			}
 			else
 				fdf->map[aux].color = DEF_COLOR;
