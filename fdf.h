@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/21 20:04:22 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/25 20:55:24 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,28 +235,135 @@ typedef struct s_bresenham{
 	float   	fade_comp[4];
 }           	t_bresenham;
 
-void    draw_welcome_menu(t_fdf *fdf);
+/*///////////// FDF \\\\\\\\\\\\\*/
+
+void	init_fdf(t_fdf *fdf);
+
 void    init_bresenham_line(t_img *img, t_coords *i_pt, t_coords *f_pt);
-void    fancy_circle(t_img *img, int xm, int ym, int r);
 void	rotate_x(t_coords *pt, float angle);
 void	rotate_y(t_coords *pt, float angle);
 void	rotate_z(t_coords *pt, float angle);
 void	rotate_map(t_fdf *fdf, int deg_x, int deg_y, int deg_z);
-void	scale_map(t_fdf *fdf);
 void	set_z_scaling(t_fdf *fdf);
-void	rotate_cube(t_fdf *fdf, t_cube *cube);
-void	init_cube(t_cube *cube);
 void    write_str(t_fdf *fdf, char *msg, int x, int y, int size);
 void    my_mlx_pixel_put(t_img *img, int x, int y, int color);
 void    init_img_data(t_img *img, void *mlx);
 void    draw_circle_inward(float center_x, float center_y, int radius, int inner_radius, float smothness, int color1, int color2, float fade, t_img *img, int mode);
 void    draw_circle_outward(float center_x, float center_y, int radius, int outer_radius, float smothness, int color1, int color2, float fade, t_img *img);
-int		check_load(t_fdf *fdf);
+void	draw_circle_loading(float center_x, float center_y, int radius, int inner_radius, float smothness, int color1, int color2, float fade, t_img *img, float perc);
+
+void	set_param_loading(t_fdf *fdf, float *fade, int *color_comp, int *color);
+void	loading_animation(t_fdf *fdf);
+void	draw_loading_screen(t_fdf *fdf, float perc);
+
+void	draw_scene_four(t_fdf *fdf);
+void	draw_scene_five(t_fdf *fdf);
+
+void	draw_map(t_fdf *fdf);
+void	scale_map(t_fdf *fdf);
+void	reset_map(t_fdf *fdf);
+void	reset_pos(t_fdf *fdf);
+void	reset_zoom(t_fdf *fdf);
+void	reset_all(t_fdf *fdf);
+
+void	process_map(t_fdf *fdf, char *map_addr);
+void	set_map_dim(t_fdf *fdf, char *map_addr);
+void	set_position(t_fdf *fdf);
+void	get_map_coords(t_fdf *fdf, char *map_addr);
+
+void	load_color_map(t_fdf *fdf);
+void	set_fade_map(float *fade, int color1, int color2, int dist);
+int		get_color(char *hexa_num);
+int		check_color(char *str);
+
+void	get_backup_map(t_fdf *fdf);
+void	get_z_diff(t_fdf *fdf);
+void	set_z_scaling(t_fdf *fdf);
+void	get_map_height(t_fdf *fdf, char *map_addr);
+void	get_map_width(t_fdf *fdf, char *map_addr);
+
+void	swap_persp(t_fdf *fdf, int p);
+void	extrude(t_fdf *fdf, float dist);
+void	zoom_map(t_fdf *fdf, float amount);
+void	rotate_key(t_fdf *fdf, int angle_x, int angle_y, int angle_z);
+void	move_key(t_fdf *fdf, int dist, int dir);
+
 int		check_enter(t_fdf *fdf);
+int		check_load(t_fdf *fdf);
+void	shift_tracker(t_fdf *fdf);
+void	animate(t_fdf *fdf);
+
+void	set_color_cube(t_cube *cube, int a, int b);
+void	bres_cube(t_fdf *fdf, t_cube *cb);
+void	draw_cube(t_fdf *fdf);
+
+void	scale_cube(t_cube *cube);
+void	rotate_cube(t_fdf *fdf, t_cube *cube);
+void	reset_cube(t_cube *cube);
+void	get_backup_cube(t_cube *cube);
+void	init_cube(t_cube *cube);
+
+int		mouse_press(int button, int x, int y, void *fdf_B);
+int		mouse_rel(int button, int x, int y, void *fdf_B);
+int		mouse_move(int x, int y, void *fdf_B);
+void	traslate_mouse(t_fdf *fdf, int x, int y);
+void	set_mouse_delayer(t_fdf *fdf);
+
+int		t_color(int trgb);
+int		r_color(int trgb);
+int		g_color(int trgb);
+int		b_color(int trgb);
+int		trgb_color(int t, int r, int g, int b);
+
+int 	fade_color_bres(t_bresenham *bres);
+void    set_fade_bres(t_bresenham *bres);
+
+int		ft_modulo(float v1, float v2);
+void	set_angles(int *angle);
+void	file_err(char *addr);
+
+int		close_all(t_fdf *fdf);
+void	free_maps(t_coords **map);
+void	free_arr(char **arr);
+
+/*///////////// FONTS \\\\\\\\\\\\\*/
+
+void	free_arr_font(char **arr);
+void	draw_letter(t_fdf *fdf, char *points, int param[4]);
+void	set_params(int x, int y, int size, int param[4]);
+void	init_bresenham_line_font(t_img *img, t_coords *i_pt, t_coords *f_pt);
+void	calculate_bresenham_font(t_img *img, t_bresenham *bres);
+void    write_str(t_fdf *fdf, char *msg, int x, int y, int size);
+
+/*///////////// SNAKE \\\\\\\\\\\\\*/
 
 void	init_snake(t_fdf *fdf);
+void	start_snake(t_fdf *fdf);
+void	set_enemies(t_sframe *sframe);
+void	populate_food(t_sframe *s_frame);
+
+void	snake_lstclear(t_snake **lst);
+t_snake	*snake_last(t_snake	*lst);
+t_snake	*new_body(int x1, int y1, int x2, int y2);
+void	add_body(t_snake **lst, t_snake *new);
+
+int		check_col_snake(t_fdf *fdf, t_snake *snake);
+int		check_col_food(t_snake *snake, t_sframe *sframe);
+int		enem_check_col_snake(t_fdf *fdf, t_snake *snake, t_sframe *sframe);
+void	enem_check_col_food(t_sframe *sframe);
+
+void	write_score(t_fdf *fdf);
+void	snake_game_over(t_fdf *fdf);
+
+void	draw_food(t_fdf *fdf, t_sframe *s_frame);
+void	draw_enemies(t_fdf *fdf, t_sframe *sframe);
+void	draw_snake(t_fdf *fdf, t_snake *snake, t_sframe *s_frame);
+void	refresh_snake(t_fdf *fdf);
+
+int		set_snake_dir(t_sframe *sframe, int dist, int dir);
+void	get_enem_target(t_fdf *fdf, t_sframe *sframe);
+void	move_enemies(t_fdf *fdf, t_sframe *sframe);
 void	move_snake(t_fdf *fdf, t_snake *snake, int dist, int dir);
 void	move_snake_loop(t_fdf *fdf, t_sframe *sframe);
-void	snake_lstclear(t_snake **lst);
 
 #endif

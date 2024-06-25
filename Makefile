@@ -6,7 +6,7 @@
 #    By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/23 13:59:42 by vperez-f          #+#    #+#              #
-#    Updated: 2024/06/21 15:28:08 by vperez-f         ###   ########.fr        #
+#    Updated: 2024/06/25 20:38:18 by vperez-f         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,13 @@ END=\033[0m
 
 NAME = fdf
 
-CFILES = fdf_main.c font.c snek.c
+CFILES = bresenham_fdf.c cube.c draw_map_utils.c flag_checks.c init_utils.c \
+		map_color_handling.c memory_utils.c reset_controls.c snake_draw.c \
+		snake_writers.c bresenham_font.c cube_utils.c draw_scenes.c font.c \
+		key_events.c map_utils2.c mlx.utils.c rotation_utils.c \
+		snake_gameplay_loops.c snek.c colors_utils.c draw_circle.c fdf_main.c \
+		functions_helpers.c loading_screen.c map_utils.c mouse_events.c \
+		snake_collisions.c  snake_list_utils.c
 
 OFILES = $(CFILES:%.c=%.o)
 
@@ -32,7 +38,7 @@ DIR_MLX = minilibx_linux/
 
 PATH_MLX = minilibx_linux/libmlx.a
 
-CFLAGS = -Wall -Wextra -Werror -O3 -fsanitize=address -fsanitize=leak
+CFLAGS = -Wall -Wextra -Werror -O3 #-fsanitize=address -fsanitize=leak
 
 MLXFLAGS = -L -lmlx -lXext -lX11 -lm
 
