@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 18:37:04 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/25 19:13:38 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/26 19:35:14 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,57 +15,27 @@
 void	get_map_coords(t_fdf *fdf, char *map_addr)
 {
 	char	**temp;
-	char	**temp_color;
 	char	*line;
-	char	*temp_line;
-	int		i;
 	int		j;
 	int		aux;
 	int		map;
 
-	i = 0;
-	j = 0;
-	temp = NULL;
-	temp_line = NULL;
-	temp_color = NULL;
-	aux = 0;
-	map = open(map_addr, O_RDONLY);
-	if (map < 0)
-		file_err(map_addr);
+	init_vars(&j, &aux, &temp);
+	map = open_map(map_addr);
 	fdf->map = (t_coords *)malloc(sizeof(t_coords) * (fdf->map_size));
 	if (!fdf->map)
 		exit(1);
 	line = get_next_line(map);
 	while (j < fdf->map_H)
 	{
+		temp = format_line(line);
+		aux = assign_coords(fdf, temp, j, aux);
 		free_arr(temp);
-		temp_line = ft_strtrim(line, "\n");
-		temp = ft_split(temp_line, ' ');
-		free(temp_line);
-		i = 0;
-		while (temp[i] != NULL)
-		{
-			fdf->map[aux].x = i;
-			fdf->map[aux].y = j;
-			fdf->map[aux].z = ft_atoi(temp[i]);
-			if (check_color(temp[i]))
-			{
-				fdf->color_flag = 1;
-				temp_color = ft_split(temp[i], ',');
-				fdf->map[aux].color = get_color(temp_color[1]);
-				free_arr(temp_color);
-			}
-			else
-				fdf->map[aux].color = DEF_COLOR;
-			i++;
-			aux++;
-		}
 		if (line)
 			free(line);
 		line = get_next_line(map);
 		j++;
 	}
-	free_arr(temp);
 	if (line)
 		free(line);
 	close(map);

@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 19:46:27 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/25 19:57:08 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/26 17:58:40 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ void	traslate_mouse(t_fdf *fdf, int x, int y)
 	}
 	if (y)
 		fdf->tras[Y] += y;
-	else if (x)
+	if (x)
 		fdf->tras[X] += x;
 	draw_map(fdf);
 }
@@ -97,7 +97,8 @@ int	mouse_move(int x, int y, void *fdf_B)
 	int		dist_y;
 
 	fdf = fdf_B;
-	if (!check_enter(fdf) || (!fdf->is_right_mouse_pres && !fdf->is_left_mouse_pres))
+	if (!check_enter(fdf) || (!fdf->is_right_mouse_pres
+			&& !fdf->is_left_mouse_pres))
 		return (0);
 	if (!check_load(fdf) || (fdf->mouse_tracker++ % fdf->mouse_delayer))
 		return (0);

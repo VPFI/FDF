@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 20:22:15 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/25 21:07:15 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/26 18:05:01 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,10 @@ void	set_fade_circle(t_circle *circle, int i_col, int f_col, int f_dt)
 
 int	fade_color_circle(t_circle *circle)
 {
-	int t;
-	int r;
-	int g;
-	int b;
+	int	t;
+	int	r;
+	int	g;
+	int	b;
 
 	if (circle->n == circle->max)
 		return (circle->color);
@@ -38,97 +38,68 @@ int	fade_color_circle(t_circle *circle)
 	return (trgb_color(t, r, g, b));
 }
 
-void	draw_circle_loading(float center_x, float center_y, int radius, int inner_radius, float smothness, int color1, int color2, float fade, t_img *img, float perc)
+void	draw_circle_loading(t_circle *c, int i_radius, float fade, float perc)
 {
-	t_circle c;
-
-	c.center_x = center_x;
-	c.center_y = center_y;
-	c.radius = radius;
-	c.smothness = smothness;
-	c.increment = PI / c.smothness;
-	c.og_color = color1;
-	fade = c.radius * fade;
-	set_fade_circle(&c, c.og_color, color2, (int)fade);
-	while (inner_radius <= c.radius)
+	c->increment = PI / c->smoothness;
+	fade = c->radius * fade;
+	set_fade_circle(c, c->og_color, c->fin_color, (int)fade);
+	while (i_radius <= c->radius)
 	{
-		c.degree = H_PI;
-		c.x = 0;
-		c.y = 0;
-		c.color = fade_color_circle(&c);
-		while (fabs(H_PI - c.degree) <= D_PI * perc)
+		c->degree = H_PI;
+		c->x = 0;
+		c->y = 0;
+		c->color = fade_color_circle(c);
+		while (fabs(H_PI - c->degree) <= D_PI * perc)
 		{
-			c.x = c.center_x + ((float)(c.radius) * cos(c.degree));
-			c.y = c.center_y + ((float)(c.radius) * sin(-c.degree));
-			my_mlx_pixel_put(img, c.x, c.y, c.color);
-			c.degree -= c.increment;
+			c->x = c->center_x + ((float)(c->radius) * cos(c->degree));
+			c->y = c->center_y + ((float)(c->radius) * sin(-c->degree));
+			my_mlx_pixel_put(c->img, c->x, c->y, c->color);
+			c->degree -= c->increment;
 		}
-		c.radius--;
-	}
-}
-void	draw_circle_inward(float center_x, float center_y, int radius, int inner_radius, float smothness, int color1, int color2, float fade, t_img *img, int mode)
-{
-	t_circle circle;
-
-	circle.x = 0;
-	circle.y = 0;
-	circle.center_x = center_x;
-	circle.center_y = center_y;
-	circle.radius = radius;
-	circle.degree = 0;
-	circle.smothness = smothness;
-	circle.increment = PI / circle.smothness;
-	circle.og_color = color1;
-	fade = circle.radius * fade;
-	set_fade_circle(&circle, circle.og_color, color2, (int)fade);
-	while (inner_radius <= circle.radius)
-	{
-		circle.degree = 0;
-		circle.x = 0;
-		circle.y = 0;
-		circle.color = fade_color_circle(&circle);
-		while (circle.degree <= H_PI)
-		{
-			circle.x = circle.center_x + ((float)(circle.radius) * cos(circle.degree));
-			circle.y = circle.center_y + ((float)(circle.radius) * sin(circle.degree));
-			if (mode > 0)
-				my_mlx_pixel_put(img, circle.x, (center_y - (circle.y - center_y)), circle.color);
-			if (mode > 1)
-				my_mlx_pixel_put(img, circle.x, circle.y, circle.color);
-			if (mode > 2)
-				my_mlx_pixel_put(img, (center_x - (circle.x - center_x)), circle.y, circle.color);
-			if (mode > 3)
-				my_mlx_pixel_put(img, (center_x - (circle.x - center_x)), (center_y - (circle.y - center_y)), circle.color);
-			circle.degree += circle.increment;
-		}
-		circle.radius--;
+		c->radius--;
 	}
 }
 
-void	draw_circle_outward(float x, float y, int radius, int outer_radius, float smothness, int color1, int color2, float fade, t_img *img)
+void	draw_circle_inward(t_circle *c, int inner_radius, float fade, int mode)
 {
-	t_circle circle;
-
-	circle.radius = radius;
-	circle.smothness = smothness;
-	circle.increment = PI / circle.smothness;
-	fade = circle.radius * fade;
-	circle.og_color = color1;
-	set_fade_circle(&circle, color1, color2, (int)fade);
-	while (circle.radius <= outer_radius)
+	c->increment = PI / c->smoothness;
+	fade = c->radius * fade;
+	set_fade_circle(c, c->og_color, c->fin_color, (int)fade);
+	while (inner_radius <= c->radius)
 	{
-		circle.degree = 0;
-		circle.color = fade_color_circle(&circle);
-		while (circle.degree <= H_PI)
+		c->degree = 0;
+		c->x = 0;
+		c->y = 0;
+		c->color = fade_color_circle(c);
+		while (c->degree <= H_PI)
 		{
-			circle.x = x + (circle.radius * cos(circle.degree));
-			circle.y = y + (circle.radius * sin(circle.degree));
-			my_mlx_pixel_put(img, circle.x, circle.y, circle.color);
-			my_mlx_pixel_put(img, (x - (circle.x - x)), circle.y, circle.color);
-			my_mlx_pixel_put(img, (x - (circle.x - x)), (y - (circle.y - y)), circle.color);
-			my_mlx_pixel_put(img, circle.x, (y - (circle.y - y)), circle.color);
-			circle.degree += circle.increment;
+			c->x = c->center_x + ((float)(c->radius) * cos(c->degree));
+			c->y = c->center_y + ((float)(c->radius) * sin(c->degree));
+			draw_quadrants(c->img, c, mode);
+			c->degree += c->increment;
 		}
-		circle.radius++;
+		c->radius--;
+	}
+}
+
+void	draw_circle_outward(t_circle *c, int outer_radius, float fade)
+{
+	c->increment = PI / c->smoothness;
+	fade = c->radius * fade;
+	set_fade_circle(c, c->og_color, c->fin_color, (int)fade);
+	while (c->radius <= outer_radius)
+	{
+		c->x = 0;
+		c->y = 0;
+		c->degree = 0;
+		c->color = fade_color_circle(c);
+		while (c->degree <= H_PI)
+		{
+			c->x = c->center_x + (c->radius * cos(c->degree));
+			c->y = c->center_y + (c->radius * sin(c->degree));
+			draw_quadrants(c->img, c, 4);
+			c->degree += c->increment;
+		}
+		c->radius++;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 20:16:43 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/25 20:55:59 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/26 18:25:02 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,21 +25,26 @@ void	set_param_loading(t_fdf *fdf, float *fade, int *color_comp, int *color)
 
 void	loading_animation(t_fdf *fdf)
 {
-	int		color;
-	float	fade[3];
-	int		color_comp[3];
-	
+	int			color;
+	float		fade[3];
+	int			color_comp[3];
+	t_circle	c;
+
 	if (fdf->b_ground.img_ptr)
-			mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
+		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	color = BLACK;
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
 	set_param_loading(fdf, fade, color_comp, &color);
-	draw_circle_inward(CENTER_X, CENTER_Y - 100, 400, 0, 3000, color, BLACK, 0.8, &fdf->b_ground, 4);
-	draw_circle_outward(CENTER_X, CENTER_Y - 100, 400, 410, 3000, CYAN_GULF, BLACK, 0.03, &fdf->b_ground);
-	write_str(fdf, "ENT", WINW * 0.43, WINH * 0.819, 3);
-	write_str(fdf, "ER", WINW * 0.513, WINH * 0.819, 3);
-	write_str(fdf, ">>>", WINW * 0.458, WINH * 0.877, 3);
-	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
+	init_circle_one(&c, CENTER_X, CENTER_Y - 100, 400);
+	init_circle_two(&c, 3000, color, BLACK);
+	init_circle_three(&c, &fdf->b_ground);
+	draw_circle_inward(&c, 0, 0.8, 4);
+	init_circle_one(&c, CENTER_X, CENTER_Y - 100, 400);
+	init_circle_two(&c, 3000, CYAN_GULF, BLACK);
+	init_circle_three(&c, &fdf->b_ground);
+	draw_circle_outward(&c, 410, 0.03);
+	animation_write(fdf);
+	my_mlx_putimg(fdf);
 	if (fdf->animation_steps == 180)
 		fdf->increment = -1;
 	if (fdf->animation_steps == 0)
@@ -49,15 +54,22 @@ void	loading_animation(t_fdf *fdf)
 
 void	draw_loading_screen(t_fdf *fdf, float perc)
 {
+	t_circle	c1;
+	t_circle	c2;
+
 	if (fdf->b_ground.img_ptr)
 		mlx_destroy_image(fdf->mlx_ptr, fdf->b_ground.img_ptr);
 	init_img_data(&fdf->b_ground, fdf->mlx_ptr);
-	draw_circle_outward(CENTER_X, CENTER_Y - 100, 400, 410, 3000, CYAN_GULF, BLACK, 0.03, &fdf->b_ground);
-	draw_circle_loading(CENTER_X, CENTER_Y - 100, 400, 0, 3000, CYAN_GULF, BLACK, 0.7, &fdf->b_ground, perc);
-	write_str(fdf, "LOADI", WINW * 0.4, WINH * 0.819, 3);
-	write_str(fdf, "NG", WINW * 0.533, WINH * 0.819, 3);
-	write_str(fdf, "---", WINW * 0.458, WINH * 0.877, 3);
-	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
+	init_circle_one(&c1, CENTER_X, CENTER_Y - 100, 400);
+	init_circle_two(&c1, 3000, CYAN_GULF, BLACK);
+	init_circle_three(&c1, &fdf->b_ground);
+	draw_circle_outward(&c1, 410, 0.03);
+	init_circle_one(&c2, CENTER_X, CENTER_Y - 100, 400);
+	init_circle_two(&c2, 3000, CYAN_GULF, BLACK);
+	init_circle_three(&c2, &fdf->b_ground);
+	draw_circle_loading(&c2, 0, 0.7, perc);
+	loading_write(fdf);
+	my_mlx_putimg(fdf);
 	if (perc == 1)
 		fdf->load_flag = 1;
 }

@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 16:37:45 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/25 19:23:48 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/26 17:53:07 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,35 +14,68 @@
 
 void	draw_food(t_fdf *fdf, t_sframe *s_frame)
 {
-	int	i;
+	int			i;
+	float		x;
+	float		y;
+	t_circle	c;
 
 	i = 0;
+	(void)fdf;
 	while (i < FOOD)
 	{
-		draw_circle_inward(s_frame->food_pos[i].x, s_frame->food_pos[i].y, s_frame->f_radius, 0, 300, GREEN, DEF_COLOR, 0.8, &fdf->b_ground, 4);
+		x = s_frame->food_pos[i].x;
+		y = s_frame->food_pos[i].y;
+		init_circle_one(&c, x, y, s_frame->f_radius);
+		init_circle_two(&c, 300, GREEN, DEF_COLOR);
+		init_circle_three(&c, &fdf->b_ground);
+		draw_circle_inward(&c, 0, 0.8, 4);
 		i++;
 	}
 }
 
 void	draw_enemies(t_fdf *fdf, t_sframe *sframe)
 {
-	int	i;
+	int			i;
+	float		x;
+	float		y;
+	t_circle	c;
 
+	(void)fdf;
 	i = 0;
 	while (i < ENEM)
 	{
-		draw_circle_inward(sframe->enemy[i].center.x, sframe->enemy[i].center.y, sframe->enemy[i].radius, 0, 1000, sframe->enemy[i].center.color, DEF_COLOR, 0.8, &fdf->b_ground, 4);
+		x = sframe->enemy[i].center.x;
+		y = sframe->enemy[i].center.y;
+		init_circle_one(&c, x, y, sframe->enemy[i].radius);
+		init_circle_two(&c, 1000, sframe->enemy[i].center.color, DEF_COLOR);
+		init_circle_three(&c, &fdf->b_ground);
+		draw_circle_inward(&c, 0, 0.8, 4);
 		i++;
 	}
 }
 
 void	draw_snake(t_fdf *fdf, t_snake *snake, t_sframe *s_frame)
 {
-	draw_circle_inward((snake)->self_pos.x, (snake)->self_pos.y, s_frame->s_radius, 0, 200, DEF_COLOR_MIN, DEF_COLOR, 0.8, &fdf->b_ground, 4);
+	float		x;
+	float		y;
+	t_circle	c;
+
+	(void)fdf;
+	x = (snake)->self_pos.x;
+	y = (snake)->self_pos.y;
+	init_circle_one(&c, x, y, s_frame->s_radius);
+	init_circle_two(&c, 200, DEF_COLOR_MIN, DEF_COLOR);
+	init_circle_three(&c, &fdf->b_ground);
+	draw_circle_inward(&c, 0, 0.8, 4);
 	snake = snake->next;
 	while (snake)
 	{
-		draw_circle_inward(snake->self_pos.x, snake->self_pos.y, s_frame->s_radius, 0, 200, DEF_COLOR_MAX, DEF_COLOR, 0.8, &fdf->b_ground, 4);
+		x = (snake)->self_pos.x;
+		y = (snake)->self_pos.y;
+		init_circle_one(&c, x, y, s_frame->s_radius);
+		init_circle_two(&c, 200, DEF_COLOR_MAX, DEF_COLOR);
+		init_circle_three(&c, &fdf->b_ground);
+		draw_circle_inward(&c, 0, 0.8, 4);
 		snake = snake->next;
 	}
 }
@@ -61,5 +94,5 @@ void	refresh_snake(t_fdf *fdf)
 		snake_game_over(fdf);
 	else if (enem_check_col_snake(fdf, fdf->snake, &fdf->s_frame))
 		snake_game_over(fdf);
-	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, fdf->b_ground.img_ptr, 0, 0);
+	my_mlx_putimg(fdf);
 }

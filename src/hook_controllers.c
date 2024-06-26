@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 15:25:12 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/26 15:25:52 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/26 17:55:25 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	rotate_hook(t_fdf *fdf, int keycode)
 	else if (keycode == D_KEY)
 		rotate_key(fdf, 0, 5, 0);
 	else if (keycode == A_KEY)
-		rotate_key(fdf, 0, -5,0);
+		rotate_key(fdf, 0, -5, 0);
 	else if (keycode == Q_KEY)
 		rotate_key(fdf, 0, 0, 5);
 	else if (keycode == E_KEY)

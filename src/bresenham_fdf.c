@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 18:36:07 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/25 20:39:27 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/26 18:07:26 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,17 @@ void	set_fade_bres(t_bresenham *bres)
 {
 	float	dist_x;
 	float	dist_y;
+	int		c1;
+	int		c2;
 
+	c1 = bres->i_pt.color;
+	c2 = bres->f_pt.color;
 	dist_x = bres->f_pt.x - bres->i_pt.x;
 	dist_y = bres->f_pt.y - bres->i_pt.y;
 	bres->max = ft_modulo(dist_x, dist_y);
-	bres->fade_comp[1] = (float)((r_color(bres->f_pt.color)) - (r_color(bres->i_pt.color))) / bres->max;
-	bres->fade_comp[2] = (float)((g_color(bres->f_pt.color)) - (g_color(bres->i_pt.color))) / bres->max;
-	bres->fade_comp[3] = (float)((b_color(bres->f_pt.color)) - (b_color(bres->i_pt.color))) / bres->max;
+	bres->fade_comp[1] = (float)((r_color(c2)) - (r_color(c1))) / bres->max;
+	bres->fade_comp[2] = (float)((g_color(c2)) - (g_color(c1))) / bres->max;
+	bres->fade_comp[3] = (float)((b_color(c2)) - (b_color(c1))) / bres->max;
 	bres->n = 1;
 }
 
