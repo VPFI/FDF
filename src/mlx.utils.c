@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 18:34:06 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/25 19:04:12 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/26 18:01:58 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,4 +27,12 @@ void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
 		return ;
 	dst = img->addr + (y * img->line_length + x * (img->bpp / 8));
 	*(unsigned int *) dst = color;
+}
+
+void	my_mlx_putimg(t_fdf *fdf)
+{
+	void	*img;
+
+	img = fdf->b_ground.img_ptr;
+	mlx_put_image_to_window(fdf->mlx_ptr, fdf->win_ptr, img, 0, 0);
 }

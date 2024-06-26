@@ -6,7 +6,7 @@
 #    By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/23 13:59:42 by vperez-f          #+#    #+#              #
-#    Updated: 2024/06/26 15:54:20 by vperez-f         ###   ########.fr        #
+#    Updated: 2024/06/26 20:18:35 by vperez-f         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,11 +16,12 @@ NAME = fdf
 
 CFILES = bresenham_fdf.c cube.c draw_map_utils.c flag_checks.c init_utils.c \
 		map_color_handling.c memory_utils.c reset_controls.c snake_draw.c \
-		snake_writers.c bresenham_font.c cube_utils.c draw_scenes.c font.c \
+		writers.c bresenham_font.c cube_utils.c draw_scenes.c font.c \
 		key_events.c map_utils2.c mlx.utils.c rotation_utils.c \
 		snake_gameplay_loops.c snek.c colors_utils.c draw_circle.c fdf_main.c \
 		functions_helpers.c loading_screen.c map_utils.c mouse_events.c \
-		snake_collisions.c  snake_list_utils.c hook_controllers.c hook_events.c
+		snake_collisions.c  snake_list_utils.c hook_controllers.c hook_events.c \
+		functions_helpers2.c
 
 OFILES = $(CFILES:%.c=%.o)
 
@@ -75,12 +76,12 @@ clean:
 	@$(MAKE) -C printf/ clean --no-print-directory
 	@$(MAKE) -C minilibx_linux/ clean --no-print-directory
 	@$(RM) $(OBJ)
-	@rmdir $(OBJ_PATH)
 
 fclean:	clean
 	@$(MAKE) -C libft/ fclean --no-print-directory
 	@$(MAKE) -C printf/ fclean --no-print-directory
 	@$(RM) $(NAME)
+	@rmdir $(OBJ_PATH)
 
 re:	fclean all
 

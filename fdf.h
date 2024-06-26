@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/26 15:28:09 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/26 19:35:01 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,13 +200,15 @@ typedef struct s_circle{
 	float   center_y;
 	int     radius;
 	float   degree;
-	float   smothness;
+	float   smoothness;
 	float   increment;
 	int     color;
 	int     og_color;
+	int		fin_color;
 	float   fade_comp[4];
 	int     n;
 	int     max;
+	t_img	*img;
 }           t_circle;
 
 typedef struct s_bresenham{
@@ -227,19 +229,29 @@ typedef struct s_bresenham{
 /*///////////// FDF \\\\\\\\\\\\\*/
 
 void	init_fdf(t_fdf *fdf);
+void    init_img_data(t_img *img, void *mlx);
+void    my_mlx_pixel_put(t_img *img, int x, int y, int color);
+void	my_mlx_putimg(t_fdf *fdf);
+
+void	write_watermark(t_fdf *fdf);
+void	animation_write(t_fdf *fdf);
+void	loading_write(t_fdf *fdf);
 
 void    init_bresenham_line(t_img *img, t_coords *i_pt, t_coords *f_pt);
+
+void	init_circle_one(t_circle *circle, float x, float y, int radius);
+void	init_circle_two(t_circle *circle, float smoothness, int color1, int color2);
+void	init_circle_three(t_circle *circle,t_img *img);
+void	draw_circle_inward(t_circle *c, int inner_radius, float fade, int mode);
+void	draw_circle_outward(t_circle *c, int outer_radius, float fade);
+void	draw_circle_loading(t_circle *c, int inner_radius, float fade, float perc);
+void	draw_quadrants(t_img *img, t_circle *c, int mode);
+
+
 void	rotate_x(t_coords *pt, float angle);
 void	rotate_y(t_coords *pt, float angle);
 void	rotate_z(t_coords *pt, float angle);
 void	rotate_map(t_fdf *fdf, int deg_x, int deg_y, int deg_z);
-void	set_z_scaling(t_fdf *fdf);
-void    write_str(t_fdf *fdf, char *msg, int x, int y, int size);
-void    my_mlx_pixel_put(t_img *img, int x, int y, int color);
-void    init_img_data(t_img *img, void *mlx);
-void    draw_circle_inward(float center_x, float center_y, int radius, int inner_radius, float smothness, int color1, int color2, float fade, t_img *img, int mode);
-void    draw_circle_outward(float center_x, float center_y, int radius, int outer_radius, float smothness, int color1, int color2, float fade, t_img *img);
-void	draw_circle_loading(float center_x, float center_y, int radius, int inner_radius, float smothness, int color1, int color2, float fade, t_img *img, float perc);
 
 int		key_hook(int keycode, void *fdf);
 int		key_hook_release(int keycode, void *fdf);
@@ -318,8 +330,13 @@ int 	fade_color_bres(t_bresenham *bres);
 void    set_fade_bres(t_bresenham *bres);
 
 int		ft_modulo(float v1, float v2);
+int		open_map(char *map_addr);
 void	set_angles(int *angle);
 void	file_err(char *addr);
+
+int		assign_coords(t_fdf *fdf, char **temp, int j, int aux);
+void	init_vars(int *j, int *aux, char ***temp);
+char	**format_line(char *line);
 
 int		close_all(t_fdf *fdf);
 void	free_maps(t_coords **map);
@@ -332,7 +349,7 @@ void	draw_letter(t_fdf *fdf, char *points, int param[4]);
 void	set_params(int x, int y, int size, int param[4]);
 void	init_bresenham_line_font(t_img *img, t_coords *i_pt, t_coords *f_pt);
 void	calculate_bresenham_font(t_img *img, t_bresenham *bres);
-void    write_str(t_fdf *fdf, char *msg, int x, int y, int size);
+void	write_str(t_fdf *fdf, char *msg, int *xy, int size);
 
 /*///////////// SNAKE \\\\\\\\\\\\\*/
 

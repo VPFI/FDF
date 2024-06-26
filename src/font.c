@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 13:41:44 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/25 17:15:26 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/26 18:27:03 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void	set_params(int x, int y, int size, int param[4])
 	param[3] = 0;
 }
 
-void	write_str(t_fdf *fdf, char *msg, int x, int y, int size)
+void	write_str(t_fdf *fdf, char *msg, int *xy, int size)
 {
 	int		l_file;
 	int		param[4];
@@ -70,7 +70,7 @@ void	write_str(t_fdf *fdf, char *msg, int x, int y, int size)
 	char	*temp_line;
 
 	path[1] = '\0';
-	set_params(x, y, size, param);
+	set_params(xy[0], xy[1], size, param);
 	while (msg[param[3]])
 	{
 		path[0] = msg[param[3]];

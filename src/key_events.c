@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 19:51:32 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/25 20:04:49 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/26 16:01:20 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	zoom_map(t_fdf *fdf, float amount)
 void	rotate_key(t_fdf *fdf, int angle_x, int angle_y, int angle_z)
 {
 	reset_map(fdf);
-	rotate_map(fdf, angle_x, angle_y ,angle_z);
+	rotate_map(fdf, angle_x, angle_y, angle_z);
 	scale_map(fdf);
 	draw_map(fdf);
 }
