@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/25 20:55:24 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/26 15:28:09 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,17 +193,6 @@ typedef struct s_fdf{
 	t_sframe	s_frame;
 }               t_fdf;
 
-typedef struct s_point{
-	float   x;
-	float   y;
-	float   z;
-	int     color;
-	int     og_color;
-	float   fade_comp[4];
-	int     n;
-	int     max;
-}           t_point;
-
 typedef struct s_circle{
 	float   x;
 	float   y;
@@ -251,6 +240,16 @@ void    init_img_data(t_img *img, void *mlx);
 void    draw_circle_inward(float center_x, float center_y, int radius, int inner_radius, float smothness, int color1, int color2, float fade, t_img *img, int mode);
 void    draw_circle_outward(float center_x, float center_y, int radius, int outer_radius, float smothness, int color1, int color2, float fade, t_img *img);
 void	draw_circle_loading(float center_x, float center_y, int radius, int inner_radius, float smothness, int color1, int color2, float fade, t_img *img, float perc);
+
+int		key_hook(int keycode, void *fdf);
+int		key_hook_release(int keycode, void *fdf);
+int		loop_hook(t_fdf *fdf);
+
+void	rotate_hook(t_fdf *fdf, int keycode);
+void	scene_hook(t_fdf *fdf, int keycode);
+void	perspective_hook(t_fdf *fdf, int keycode);
+void	extrude_zoom_hook(t_fdf *fdf, int keycode);
+void	move_hook(t_fdf *fdf, int keycode);
 
 void	set_param_loading(t_fdf *fdf, float *fade, int *color_comp, int *color);
 void	loading_animation(t_fdf *fdf);

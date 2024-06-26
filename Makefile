@@ -6,7 +6,7 @@
 #    By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/23 13:59:42 by vperez-f          #+#    #+#              #
-#    Updated: 2024/06/25 20:38:18 by vperez-f         ###   ########.fr        #
+#    Updated: 2024/06/26 15:54:20 by vperez-f         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,11 +20,15 @@ CFILES = bresenham_fdf.c cube.c draw_map_utils.c flag_checks.c init_utils.c \
 		key_events.c map_utils2.c mlx.utils.c rotation_utils.c \
 		snake_gameplay_loops.c snek.c colors_utils.c draw_circle.c fdf_main.c \
 		functions_helpers.c loading_screen.c map_utils.c mouse_events.c \
-		snake_collisions.c  snake_list_utils.c
+		snake_collisions.c  snake_list_utils.c hook_controllers.c hook_events.c
 
 OFILES = $(CFILES:%.c=%.o)
 
-OBJ = $(OFILES)
+OBJ = $(addprefix $(OBJ_DIR),$(OFILES))
+
+OBJ_DIR = obj/
+
+OBJ_PATH = obj
 
 DIR_LIBFT = libft/ 
 
@@ -48,9 +52,6 @@ ARLIB = ar rc
 
 RM = rm -f
 
-%.o: src/%.c $(DIR_LFT) $(DIR_PTF) $(DIR_MLX) fdf.h Makefile
-	$(CC) $(CFLAGS) -c $< -o $@
-
 all: extra_make $(NAME)
 
 extra_make:
@@ -61,15 +62,20 @@ extra_make:
 	@printf "MINILIBX: COMPILING...\n$(END)"
 	@$(MAKE) -C minilibx_linux/ --no-print-directory
 
-$(NAME): $(OFILES) $(PATH_LFT) $(PATH_MLX)
-	@$(CC) $(CFLAGS) $(OFILES) $(PATH_LFT) $(PATH_PTF) $(PATH_MLX) $(MLXFLAGS) -o $(NAME)
+$(NAME): $(OBJ) $(PATH_LFT) $(PATH_MLX)
+	@$(CC) $(CFLAGS) $(OBJ) $(PATH_LFT) $(PATH_PTF) $(PATH_MLX) $(MLXFLAGS) -o $(NAME)
 	@printf "\n$(NAME) COMPILED!\n$(END)"
+
+$(OBJ_DIR)%.o: src/%.c $(DIR_LFT) $(DIR_PTF) $(DIR_MLX) fdf.h Makefile
+	@mkdir -p $(OBJ_PATH)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	@$(MAKE) -C libft/ clean --no-print-directory
 	@$(MAKE) -C printf/ clean --no-print-directory
 	@$(MAKE) -C minilibx_linux/ clean --no-print-directory
 	@$(RM) $(OBJ)
+	@rmdir $(OBJ_PATH)
 
 fclean:	clean
 	@$(MAKE) -C libft/ fclean --no-print-directory
