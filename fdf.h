@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/23 18:27:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/26 19:35:01 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/27 23:13:12 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -281,6 +281,11 @@ void	process_map(t_fdf *fdf, char *map_addr);
 void	set_map_dim(t_fdf *fdf, char *map_addr);
 void	set_position(t_fdf *fdf);
 void	get_map_coords(t_fdf *fdf, char *map_addr);
+
+int		check_hex_num(char *line);
+int		check_line(char *line);
+void	check_err(char ***list);
+void	check_map(t_fdf *fdf, char *map_addr);
 
 void	load_color_map(t_fdf *fdf);
 void	set_fade_map(float *fade, int color1, int color2, int dist);

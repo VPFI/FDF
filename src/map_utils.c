@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 18:37:04 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/26 19:35:14 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/27 23:14:23 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,11 +78,14 @@ void	set_map_dim(t_fdf *fdf, char *map_addr)
 	fdf->map_edges_H = fdf->map_H - 1;
 	fdf->spacing_W = (WINW * fdf->zoom) / (fdf->map_edges_W);
 	fdf->spacing_H = (WINH * fdf->zoom) / (fdf->map_edges_H);
+	if (fdf->map_edges_H == 0)
+		fdf->spacing_H = 0;
 }
 
 void	process_map(t_fdf *fdf, char *map_addr)
 {
 	set_map_dim(fdf, map_addr);
+	check_map(fdf, map_addr);
 	draw_loading_screen(fdf, 0.22);
 	set_mouse_delayer(fdf);
 	draw_loading_screen(fdf, 0.34);

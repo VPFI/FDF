@@ -6,7 +6,7 @@
 #    By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/23 13:59:42 by vperez-f          #+#    #+#              #
-#    Updated: 2024/06/27 18:40:36 by vperez-f         ###   ########.fr        #
+#    Updated: 2024/06/27 23:15:13 by vperez-f         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,7 @@ CFILES = bresenham_fdf.c cube.c draw_map_utils.c flag_checks.c init_utils.c \
 		snake_gameplay_loops.c snek.c colors_utils.c draw_circle.c fdf_main.c \
 		functions_helpers.c loading_screen.c map_utils.c mouse_events.c \
 		snake_collisions.c  snake_list_utils.c hook_controllers.c hook_events.c \
-		functions_helpers2.c
+		functions_helpers2.c check_map.c
 
 OFILES = $(CFILES:%.c=%.o)
 
@@ -43,7 +43,7 @@ DIR_MLX = minilibx_linux/
 
 PATH_MLX = minilibx_linux/libmlx.a
 
-CFLAGS = -Wall -Wextra -Werror -O3 #-fsanitize=address -fsanitize=leak
+CFLAGS = -Wall -Wextra -Werror -O3 -fsanitize=address -fsanitize=leak
 
 MLXFLAGS = -L -lmlx -lXext -lX11 -lm
 
