@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 18:44:04 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/25 19:08:48 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/06/27 22:02:20 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ void	get_map_width(t_fdf *fdf, char *map_addr)
 	if (map < 0)
 		file_err(map_addr);
 	line = get_next_line(map);
+	if (!line)
+		file_err("MAP ERROR3");
 	temp_line = ft_strtrim(line, "\n");
 	list = ft_split(temp_line, ' ');
 	free(temp_line);
@@ -35,6 +37,8 @@ void	get_map_width(t_fdf *fdf, char *map_addr)
 		free(line);
 	free_arr(list);
 	close(map);
+	if (fdf->map_W == 0)
+		file_err("MAP ERROR4");
 }
 
 void	get_map_height(t_fdf *fdf, char *map_addr)
