@@ -6,7 +6,7 @@
 #    By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/23 13:59:42 by vperez-f          #+#    #+#              #
-#    Updated: 2024/06/26 20:18:35 by vperez-f         ###   ########.fr        #
+#    Updated: 2024/06/27 18:40:36 by vperez-f         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -81,7 +81,7 @@ fclean:	clean
 	@$(MAKE) -C libft/ fclean --no-print-directory
 	@$(MAKE) -C printf/ fclean --no-print-directory
 	@$(RM) $(NAME)
-	@rmdir $(OBJ_PATH)
+	@rm -rf $(OBJ_PATH)
 
 re:	fclean all
 
