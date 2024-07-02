@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 20:06:20 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/27 23:16:13 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/07/02 16:07:39 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ void	scale_map(t_fdf *fdf)
 	i = 0;
 	x = CENTER_X;
 	y = CENTER_Y;
+	fdf->spacing_W = (WINW * fdf->zoom) / (fdf->map_edges_W);
+	fdf->spacing_H = (WINH * fdf->zoom) / (fdf->map_edges_H);
 	while (i < fdf->map_size)
 	{
 		fdf->map[i].x = x + (fdf->spacing_W * fdf->map[i].x) + fdf->tras[X];

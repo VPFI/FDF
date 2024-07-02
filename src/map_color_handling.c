@@ -6,7 +6,7 @@
 /*   By: vperez-f <vperez-f@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/25 18:48:08 by vperez-f          #+#    #+#             */
-/*   Updated: 2024/06/25 19:10:33 by vperez-f         ###   ########.fr       */
+/*   Updated: 2024/07/02 18:14:20 by vperez-f         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,8 @@ int	get_color(char *hexa_num)
 
 void	set_fade_map(float *fade, int color1, int color2, int dist)
 {
+	if (dist == 0)
+		dist = 1;
 	fade[0] = (float)((r_color(color1)) - (r_color(color2))) / dist;
 	fade[1] = (float)((g_color(color1)) - (g_color(color2))) / dist;
 	fade[2] = (float)((b_color(color1)) - (b_color(color2))) / dist;
@@ -70,7 +72,7 @@ void	load_color_map(t_fdf *fdf)
 	while (i < fdf->map_size)
 	{
 		c[0] = t_color(DEF_COLOR);
-		if (fdf->map[i].z > 0)
+		if (fdf->map[i].z >= 0)
 		{
 			n = fdf->z_max - (fdf->z_max - fdf->map[i].z);
 			set_fade_map(fade, DEF_COLOR_MAX, DEF_COLOR, fdf->z_max);
