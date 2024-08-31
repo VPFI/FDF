@@ -88,13 +88,11 @@ void	enem_check_col_food(t_sframe *sframe)
 
 int	enem_check_col_snake(t_fdf *fdf, t_snake *snake, t_sframe *sframe)
 {
-	t_coords	head;
 	int			diff;
 	int			i;
 
 	i = 0;
 	diff = 0;
-	head = snake->self_pos;
 	while (i < ENEM)
 	{
 		diff = fabs(sframe->enemy[i].center.x - snake->self_pos.x)

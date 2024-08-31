@@ -14,9 +14,6 @@
 
 void	extrude(t_fdf *fdf, float dist)
 {
-	int	i;
-
-	i = 0;
 	fdf->z_factor *= dist;
 	reset_map(fdf);
 	rotate_map(fdf, 0, 0, 0);

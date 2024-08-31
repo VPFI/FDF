@@ -56,6 +56,7 @@ void	draw_quadrants(t_img *img, t_circle *c, int mode)
 		my_mlx_pixel_put(img, (x2 - (x1 - x2)), c->y, col);
 	if (mode > 3)
 		my_mlx_pixel_put(img, (x2 - (x1 - x2)), (y2 - (c->y - y2)), col);
+	(void)y1;
 }
 
 int	open_map(char *map_addr)

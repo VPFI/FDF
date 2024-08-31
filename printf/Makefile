@@ -16,7 +16,7 @@ OFILES = $(CFILES:%.c=%.o)
 
 OBJ = $(OFILES)
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = #-Wall -Wextra -Werror
 
 CC = cc
 

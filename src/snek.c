@@ -62,9 +62,6 @@ void	start_snake(t_fdf *fdf)
 
 void	init_snake(t_fdf *fdf)
 {
-	int		i;
-
-	i = 0;
 	if (fdf->snake_flag == 1)
 		snake_lstclear(&fdf->snake);
 	fdf->snake = NULL;
